@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/home_controller.dart';
 
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key, required this.title});
+class HomePage extends StatelessWidget {
+  const HomePage({super.key, required this.title});
 
   final String title;
 
@@ -16,18 +16,28 @@ class MyHomePage extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      body: const Center(
+        child: Row(
           children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            GetBuilder<HomeController>(
-              builder: (_) {
-                return Text(
-                  '${controller.counter}',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                );
-              },
+            Expanded(
+              flex: 3,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text('Column 1, Text 1'),
+                  Text('Column 1, Text 2'),
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text('Column 2, Text 1'),
+                  Text('Column 2, Text 2'),
+                ],
+              ),
             ),
           ],
         ),
