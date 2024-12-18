@@ -42,7 +42,7 @@ class NumericKeypad extends StatelessWidget {
               }
 
               return Padding(
-                padding: const EdgeInsets.all(3.0),
+                padding: const EdgeInsets.all(5.0),
                 child: ElevatedButton(
                   style: buttonStyle,
                   onPressed: () {
