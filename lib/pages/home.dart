@@ -21,7 +21,7 @@ class HomePage extends StatelessWidget {
       body: Row(
         children: <Widget>[
           const Expanded(
-            flex: 1,
+            flex: 3,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -31,7 +31,7 @@ class HomePage extends StatelessWidget {
             ),
           ),
           Expanded(
-            flex: 1,
+            flex: 2,
             child: NumericKeypad(),
           ),
         ],

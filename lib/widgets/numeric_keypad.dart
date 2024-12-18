@@ -20,7 +20,7 @@ class NumericKeypad extends StatelessWidget {
       children: [
         Obx(() => Text(
           controller.input.value,
-          style: const TextStyle(fontSize: 24),
+          style: const TextStyle(fontSize: 90),
         )),
         Expanded(
           child: GridView.builder(
@@ -31,10 +31,14 @@ class NumericKeypad extends StatelessWidget {
             itemCount: keys.length,
             itemBuilder: (context, index) {
               ButtonStyle buttonStyle = ButtonStyles.numericKeypadButton;
+              Widget buttonChild = Text(keys[index]);
+
               if (keys[index] == '←') {
                 buttonStyle = ButtonStyles.deleteButton;
+                buttonChild = const Icon(Icons.backspace, color: Colors.white);
               } else if (keys[index] == '✔') {
                 buttonStyle = ButtonStyles.confirmButton;
+                buttonChild = const Icon(Icons.check, color: Colors.white);
               }
 
               return Padding(
@@ -50,7 +54,7 @@ class NumericKeypad extends StatelessWidget {
                       controller.addInput(keys[index]);
                     }
                   },
-                  child: Text(keys[index]),
+                  child: buttonChild,
                 ),
               );
             },
