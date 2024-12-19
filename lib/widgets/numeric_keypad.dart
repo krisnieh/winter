@@ -1,4 +1,3 @@
-// lib/widgets/numeric_keypad.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/numeric_keypad_controller.dart';
@@ -18,10 +17,24 @@ class NumericKeypad extends StatelessWidget {
 
     return Column(
       children: [
-        Obx(() => Text(
-          controller.input.value,
-          style: const TextStyle(fontSize: 90),
-        )),
+        Padding(
+          padding: const EdgeInsets.all(16.0), // Set the desired margin
+          child: Obx(() => Container(
+            decoration: BoxDecoration(
+              color: Colors.cyan[50],
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            padding: const EdgeInsets.fromLTRB(10, 1, 10, 1),
+            child: TextField(
+              controller: TextEditingController(text: controller.input.value),
+              style: const TextStyle(fontSize: 80),
+              readOnly: true,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+              ),
+            ),
+          )),
+        ),
         Expanded(
           child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -42,19 +55,26 @@ class NumericKeypad extends StatelessWidget {
               }
 
               return Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: ElevatedButton(
-                  style: buttonStyle,
-                  onPressed: () {
-                    if (keys[index] == '←') {
-                      controller.deleteInput();
-                    } else if (keys[index] == '✔') {
-                      controller.confirmInput();
-                    } else {
-                      controller.addInput(keys[index]);
-                    }
-                  },
-                  child: buttonChild,
+                padding: const EdgeInsets.all(10.0),
+                child: SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: ElevatedButton(
+                    style: buttonStyle,
+                    onPressed: () {
+                      if (keys[index] == '←') {
+                        controller.deleteInput();
+                      } else if (keys[index] == '✔') {
+                        controller.confirmInput();
+                      } else {
+                        controller.addInput(keys[index]);
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: buttonChild,
+                    ),
+                  ),
                 ),
               );
             },
