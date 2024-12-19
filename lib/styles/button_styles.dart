@@ -5,7 +5,7 @@ class ButtonStyles {
   static final ButtonStyle numericKeypadButton = ElevatedButton.styleFrom(
     // minimumSize: const Size(100, 100), // Set the button size
     // padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0), // Set the text padding
-    textStyle: const TextStyle(fontSize: 24),
+    textStyle: const TextStyle(fontSize: 18),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(8.0),
     ),
@@ -16,7 +16,7 @@ class ButtonStyles {
     backgroundColor: Colors.pink,
     // minimumSize: const Size(100, 100), // Set the button size
     // padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0), // Set the text padding
-    textStyle: const TextStyle(fontSize: 24),
+    textStyle: const TextStyle(fontSize: 18),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(8.0),
     ),
@@ -27,7 +27,7 @@ class ButtonStyles {
     backgroundColor: Colors.lightGreen,
     // minimumSize: const Size(100, 100), // Set the button size
     // padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0), // Set the text padding
-    textStyle: const TextStyle(fontSize: 24),
+    textStyle: const TextStyle(fontSize: 18),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(8.0),
     ),
