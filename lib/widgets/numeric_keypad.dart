@@ -29,6 +29,7 @@ class NumericKeypad extends StatelessWidget {
               controller: TextEditingController(text: controller.input.value),
               style: const TextStyle(fontSize: 80),
               readOnly: true,
+              textAlign: TextAlign.center, // Center the text
               decoration: const InputDecoration(
                 border: InputBorder.none,
               ),
@@ -55,7 +56,7 @@ class NumericKeypad extends StatelessWidget {
               }
 
               return Padding(
-                padding: const EdgeInsets.all(10.0),
+                padding: const EdgeInsets.all(5.0),
                 child: SizedBox(
                   width: 100,
                   height: 100,
