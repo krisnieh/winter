@@ -76,13 +76,17 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: Align(
-        alignment: Alignment.bottomLeft,
-        child: FloatingActionButton(
-          onPressed: controller.incrementCounter,
-          tooltip: 'Increment',
-          child: const Icon(Icons.handshake),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(left: 30),
+        child: Align(
+          alignment: Alignment.bottomLeft,
+          child: FloatingActionButton(
+            onPressed: controller.incrementCounter,
+            tooltip: '通知质检员',
+            child: const Icon(Icons.call),
+          ),
         ),
+
       ),
     );
   }
