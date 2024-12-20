@@ -2,7 +2,7 @@
 import 'package:get/get.dart';
 
 class NumericKeypadController extends GetxController {
-  var input = ''.obs;
+  var input = '80'.obs;
 
   void addInput(String value) {
     input.value += value;

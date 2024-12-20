@@ -27,13 +27,14 @@ class HomePage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text('Column 1, Text 1'),
-                Text('Column 1, Text 2'),
+                Text('等待系统初始化...', style: TextStyle(fontSize: 24)),
+                Text('System initializing...', style: TextStyle(color: Colors.grey),),
               ],
             ),
           ),
           Expanded(
             flex: 4,
+
             child: NumericKeypad(),
           ),
           Expanded(
@@ -42,7 +43,7 @@ class HomePage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 SizedBox(
-                  height: 200, // Set the desired height here
+                  height: 500, // Set the desired height here
                   child: VerticalSlider(
                     min: 0,
                     max: 100,
@@ -76,10 +77,13 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: controller.incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.handshake),
+      floatingActionButton: Align(
+        alignment: Alignment.bottomLeft,
+        child: FloatingActionButton(
+          onPressed: controller.incrementCounter,
+          tooltip: 'Increment',
+          child: const Icon(Icons.handshake),
+        ),
       ),
     );
   }

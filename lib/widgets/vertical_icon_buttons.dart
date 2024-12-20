@@ -31,14 +31,15 @@ class VerticalIconButtons extends StatelessWidget {
         ),
         const SizedBox(height: 15),
         IconButton(
-          icon: const Icon(Icons.power),
-          onPressed: onPower12VPressed,
+          icon: const Icon(Icons.battery_full),
+          onPressed: onPower24VPressed,
         ),
         const SizedBox(height: 15),
         IconButton(
-          icon: const Icon(Icons.cable),
-          onPressed: onPower24VPressed,
+          icon: const Icon(Icons.battery_4_bar),
+          onPressed: onPower12VPressed,
         ),
+
       ],
     );
   }
