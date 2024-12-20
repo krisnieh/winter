@@ -27,6 +27,8 @@ class HomePage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                CircularProgressIndicator(),
+                SizedBox(height: 20),
                 Text('等待系统初始化...', style: TextStyle(fontSize: 24)),
                 Text('System initializing...', style: TextStyle(color: Colors.grey),),
               ],

@@ -27,7 +27,7 @@ class VerticalIconButtons extends StatelessWidget {
         const SizedBox(height: 15),
         IconButton(
           icon: const Icon(Icons.air),
-          onPressed: onFanPressed,
+          onPressed: null,
         ),
         const SizedBox(height: 15),
         IconButton(
