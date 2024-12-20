@@ -34,7 +34,6 @@ class HomePage extends StatelessWidget {
           ),
           Expanded(
             flex: 4,
-
             child: NumericKeypad(),
           ),
           Expanded(

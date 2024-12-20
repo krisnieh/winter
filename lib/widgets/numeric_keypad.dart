@@ -18,7 +18,7 @@ class NumericKeypad extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(16.0), // Set the desired margin
+          padding: const EdgeInsets.fromLTRB(5,200,5,10), // Set the desired margin
           child: Obx(() => Container(
             decoration: BoxDecoration(
               color: Colors.cyan[50],
