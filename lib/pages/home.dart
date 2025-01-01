@@ -5,6 +5,7 @@ import '../widgets/numeric_keypad.dart';
 import '../widgets/vertical_slider.dart';
 import '../widgets/vertical_icon_buttons.dart';
 import '../widgets/custom_app_bar.dart';
+import '../controllers/network_controller.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key, required this.title});
@@ -13,6 +14,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    Get.put(NetworkController());
     final HomeController controller = Get.put(HomeController());
 
     return Scaffold(
@@ -52,8 +55,9 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
                 VerticalIconButtons(
-                  onLightPressed: () {
-                    print('Light button pressed');
+                  onLightPressed: () async {
+                    final HomeController controller = Get.find();
+                    await controller.toggleLights();
                   },
                   onFanPressed: () {
                     print('Fan button pressed');
