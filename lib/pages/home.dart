@@ -45,7 +45,7 @@ class HomePage extends StatelessWidget {
                   child: VerticalSlider(
                     min: 0,
                     max: 100,
-                    divisions: 10,
+                    divisions: 20,
                     onChanged: (double value) {
                       print('Selected value: $value');
                     },
