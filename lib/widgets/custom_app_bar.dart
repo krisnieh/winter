@@ -7,6 +7,18 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   const CustomAppBar({Key? key, required this.title}) : super(key: key);
 
+  Future<void> _shutdownLinux({bool restart = false, int delay = 0}) {
+    final params = <String>[];
+
+    if (restart) {
+      params.add('-r');
+    }
+
+    params.addAll(<String>['-t', delay.toString(), 'now']);
+
+    return Process.run('shutdown', params);
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -20,11 +32,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         Padding(
           padding: const EdgeInsets.only(right: 20),
           child: IconButton(
-            icon: const Icon(Icons.settings, color: Colors.white),
-            onPressed: ()  {
+            icon: const Icon(Icons.power_settings_new, color: Colors.white),
+            onPressed: () async {
               // 调用系统命令关闭机器
-              // await shutdownLinux();
-              print("shutdown");
+              await _shutdownLinux();
+              // print("shutdown");
             },
           ),
         ),
