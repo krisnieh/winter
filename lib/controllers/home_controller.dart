@@ -23,22 +23,22 @@ class HomeController extends GetxController {
 
     switch (lineName) {
       case 'a':
-        url = 'http://172.16.21.1:5000/action/lights';
+        url = 'http://172.16.21.1:5000/action/';
         break;
       case 'b':
-        url = 'http://172.16.21.2:5000/action/lights';
+        url = 'http://172.16.21.2:5000/action/';
         break;
       case 'c':
-        url = 'http://172.16.21.3:5000/action/lights';
+        url = 'http://172.16.21.3:5000/action/';
         break;
       case 'd':
-        url = 'http://172.16.21.4:5000/action/lights';
+        url = 'http://172.16.21.4:5000/action/';
         break;
       default:
-        url = 'http://172.16.0.8:5000/action/lights';
+        url = 'http://172.16.0.8:5000/action/';
     }
 
-    url += "/$lineName/$unitId";
+    url += "lights/$lineName/$unitId";
 
     try {
       final response = await Dio().get(url);

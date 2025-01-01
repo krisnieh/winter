@@ -75,7 +75,7 @@ class HomePage extends StatelessWidget {
         child: Align(
           alignment: Alignment.bottomLeft,
           child: FloatingActionButton(
-            onPressed: controller.incrementCounter,
+            onPressed: controller.toggleLights,
             tooltip: '通知质检员',
             child: const Icon(Icons.call),
           ),
