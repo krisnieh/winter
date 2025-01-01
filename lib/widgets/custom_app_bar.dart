@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -19,8 +21,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           padding: const EdgeInsets.only(right: 20),
           child: IconButton(
             icon: const Icon(Icons.settings, color: Colors.white),
-            onPressed: () {
-              // Handle settings button press
+            onPressed: ()  {
+              // 调用系统命令关闭机器
+              // await shutdownLinux();
+              print("shutdown");
             },
           ),
         ),
