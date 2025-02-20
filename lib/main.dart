@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_fullscreen/flutter_fullscreen.dart';
-import 'pages/home.dart';
+import 'package:get/get.dart';
+import 'views/home/working_line_page.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await FullScreen.ensureInitialized();
-  FullScreen.setFullScreen(true);
+void main() {
   runApp(const MyApp());
 }
 
@@ -14,14 +11,34 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'HenjouSmartFactory',
-      debugShowCheckedModeBanner: false,
+    return GetMaterialApp(
+      title: 'HFS',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
+        primarySwatch: Colors.blue,
+        scaffoldBackgroundColor: Colors.blue[50],
+        appBarTheme: const AppBarTheme(
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.blue,
+        ),
+        sliderTheme: SliderThemeData(
+          activeTrackColor: Colors.blue,
+          inactiveTrackColor: Colors.blue.withAlpha(76),
+          thumbColor: Colors.blue,
+          overlayColor: Colors.blue.withAlpha(76),
+          valueIndicatorColor: Colors.blue,
+          valueIndicatorTextStyle: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+          ),
+        ),
       ),
-      home: const HomePage(title: 'HFS'),
+      home: const WorkingLinePage(),
     );
   }
 }
