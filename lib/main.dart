@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'views/home/working_line_page.dart';
+import 'views/working_line/working_line_page.dart';
 
 void main() {
   runApp(const MyApp());
