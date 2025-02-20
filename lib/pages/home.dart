@@ -14,9 +14,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     Get.put(NetworkController());
-    final HomeController controller = Get.put(HomeController());
+    // final HomeController controller = Get.put(HomeController());
 
     return Scaffold(
       appBar: CustomAppBar(title: title),
@@ -30,7 +29,8 @@ class HomePage extends StatelessWidget {
                 CircularProgressIndicator(),
                 SizedBox(height: 20),
                 Text('等待系统初始化...', style: TextStyle(fontSize: 24)),
-                Text('System initializing...', style: TextStyle(color: Colors.grey)),
+                Text('System initializing...',
+                    style: TextStyle(color: Colors.grey)),
               ],
             ),
           ),
@@ -78,15 +78,29 @@ class HomePage extends StatelessWidget {
         padding: const EdgeInsets.only(left: 30),
         child: Align(
           alignment: Alignment.bottomLeft,
-          child: FloatingActionButton(
-            onPressed: () async {
-              final HomeController controller = Get.find();
-              await controller.toggleError();
-            },
-            tooltip: '通知质检员',
-            backgroundColor: Colors.red,
-            foregroundColor: Colors.white,
-            child: const Icon(Icons.notifications_active),
+          child: GetBuilder<HomeController>(
+            init: HomeController(),
+            builder: (controller) => FloatingActionButton(
+              onPressed: controller.isErrorLoading.value
+                  ? null // 当isErrorLoading为true时，按钮将被禁用
+                  : () async {
+                      await controller.toggleError();
+                    },
+              tooltip: '通知质检员',
+              backgroundColor:
+                  controller.isErrorLoading.value ? Colors.grey : Colors.red,
+              foregroundColor: Colors.white,
+              child: controller.isErrorLoading.value
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : const Icon(Icons.notifications_active),
+            ),
           ),
         ),
       ),
