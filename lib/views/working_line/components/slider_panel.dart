@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../controllers/main_controller.dart';
+import '../../../controllers/working_line/device_controller.dart';
 
 class SliderPanel extends StatelessWidget {
-  final MainController controller;
+  final DeviceController controller;
 
   const SliderPanel({super.key, required this.controller});
 

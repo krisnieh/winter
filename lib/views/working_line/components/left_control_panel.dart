@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../../controllers/working_line/device_controller.dart';
 
 class LeftControlPanel extends StatelessWidget {
   const LeftControlPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<DeviceController>(); // 获取controller实例
+
     return Positioned(
       left: 16,
       bottom: 16,
@@ -18,13 +22,17 @@ class LeftControlPanel extends StatelessWidget {
             child: const Icon(Icons.call),
           ),
           const SizedBox(width: 16),
-          FloatingActionButton(
-            heroTag: 'light',
-            onPressed: () {},
-            backgroundColor: Colors.amber[700],
-            foregroundColor: Colors.white,
-            child: const Icon(Icons.lightbulb),
-          ),
+          Obx(() => FloatingActionButton(
+                heroTag: 'light',
+                onPressed: controller.isLightButtonEnabled.value
+                    ? controller.toggleLight
+                    : null,
+                backgroundColor: controller.isLightOn.value
+                    ? Colors.amber[700]
+                    : Colors.grey[300],
+                foregroundColor: Colors.white,
+                child: const Icon(Icons.lightbulb),
+              )),
           const SizedBox(width: 16),
           FloatingActionButton(
             heroTag: 'fan',

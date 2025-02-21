@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../controllers/main_controller.dart';
+import '../../../controllers/working_line/working_line_controller.dart';
 
 class NumberKeypad extends StatelessWidget {
-  final MainController controller;
+  final WorkingLineController controller;
 
   const NumberKeypad({super.key, required this.controller});
 

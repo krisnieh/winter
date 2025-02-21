@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controllers/main_controller.dart';
 import 'components/custom_app_bar.dart';
 import 'components/left_control_panel.dart';
 import 'components/main_content.dart';
 import 'components/number_keypad.dart';
 import 'components/slider_panel.dart';
+import '../../controllers/working_line/working_line_controller.dart';
+import '../../controllers/working_line/device_controller.dart';
 
 class WorkingLinePage extends StatelessWidget {
   const WorkingLinePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(MainController());
+    final workingLineController = Get.put(WorkingLineController());
+    final deviceController = Get.put(DeviceController());
 
     return Scaffold(
       appBar: const CustomAppBar(),
@@ -20,9 +22,9 @@ class WorkingLinePage extends StatelessWidget {
         children: [
           Row(
             children: [
-              MainContent(controller: controller),
-              NumberKeypad(controller: controller),
-              SliderPanel(controller: controller),
+              MainContent(controller: workingLineController),
+              NumberKeypad(controller: workingLineController),
+              SliderPanel(controller: deviceController),
             ],
           ),
           const LeftControlPanel(),
