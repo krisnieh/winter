@@ -6,6 +6,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      backgroundColor: Theme.of(context).primaryColor,
+      foregroundColor: Colors.white,
       title: Row(
         children: [
           const Text('HFS'),

@@ -9,6 +9,8 @@ class MainController extends GetxController {
   final RxBool isSettingButtonEnabled = true.obs;
 
   void appendNumber(String number) {
+    if (inputValue.isEmpty && number == '0') return;
+    if (inputValue.value.length >= 11) return;
     inputValue.value += number;
   }
 

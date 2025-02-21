@@ -29,9 +29,42 @@ class LeftControlPanel extends StatelessWidget {
           FloatingActionButton(
             heroTag: 'fan',
             onPressed: () {},
-            backgroundColor: Colors.lightBlue,
+            backgroundColor: Theme.of(context).primaryColor,
             foregroundColor: Colors.white,
             child: const Icon(Icons.air),
+          ),
+          const SizedBox(width: 16),
+          FloatingActionButton(
+            heroTag: 'load',
+            onPressed: () {},
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+            foregroundColor: Colors.white,
+            child: const Icon(Icons.download),
+          ),
+          const SizedBox(width: 16),
+          FloatingActionButton(
+            heroTag: 'upload',
+            onPressed: () {},
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+            foregroundColor: Colors.white,
+            child: const Icon(Icons.upload),
+          ),
+          const SizedBox(width: 30),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.black.withAlpha(153),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Row(
+              children: [
+                Text('操作台高度: 75cm  ', style: TextStyle(color: Colors.white)),
+                Text('灯光状态: 开启  ', style: TextStyle(color: Colors.white)),
+                Text('风扇状态: -  ', style: TextStyle(color: Colors.white)),
+                Text('环境湿度: -  ', style: TextStyle(color: Colors.white)),
+                Text('环境温度: -', style: TextStyle(color: Colors.white)),
+              ],
+            ),
           ),
         ],
       ),

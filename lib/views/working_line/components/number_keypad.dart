@@ -23,11 +23,23 @@ class NumberKeypad extends StatelessWidget {
                 border: Border.all(color: Colors.grey),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Obx(() => Text(
-                    controller.inputValue.value,
-                    style: const TextStyle(fontSize: 70),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+              child: Obx(() => Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        controller.inputValue.value,
+                        style: const TextStyle(fontSize: 70),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      Text(
+                        '${controller.inputValue.value.length}/11',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ],
                   )),
             ),
           ),
@@ -99,7 +111,7 @@ class NumberButton extends StatelessWidget {
                 color: icon == Icons.backspace
                     ? Colors.red
                     : icon == Icons.search
-                        ? Colors.blue
+                        ? Theme.of(context).primaryColor
                         : theme.iconTheme.color,
               )
             : Text(
