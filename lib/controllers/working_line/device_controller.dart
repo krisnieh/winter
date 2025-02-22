@@ -43,9 +43,8 @@ class DeviceController extends BaseController {
   Future<void> toggleLight() async {
     isLightButtonEnabled.value = false;
     try {
-      final response = await dio.post(
-        buildUrl('/light/toggle'),
-        data: {},
+      final response = await dio.get(
+        buildUrl('/lights/toggle'),
       );
       isLightOn.value = response.data['status'] ?? false;
     } catch (e) {

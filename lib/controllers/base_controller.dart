@@ -19,18 +19,15 @@ class BaseController extends GetxController {
   void _parseHostname() {
     try {
       final hostname = Platform.localHostname; // 获取主机名
-      final parts = hostname.split('_');
-      if (parts.length == 3) {
-        equipment = parts[0];
-        line = parts[1];
-        unit = parts[2];
+      final parts = hostname.split('-');
+      if (parts.length >= 2) {
+        line = parts[parts.length - 2]; // 倒数第二个值
+        unit = parts[parts.length - 1]; // 倒数第一个值
       } else {
-        equipment = 'unknown';
         line = 'unknown';
         unit = 'unknown';
       }
     } catch (e) {
-      equipment = 'unknown';
       line = 'unknown';
       unit = 'unknown';
       Get.snackbar('Error', '获取主机名失败: ${e.toString()}');
