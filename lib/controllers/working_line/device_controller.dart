@@ -1,6 +1,7 @@
 import '../base_controller.dart';
 import 'package:get/get.dart';
 import '../../services/mqtt_service.dart';
+import 'package:flutter/foundation.dart';
 
 class DeviceController extends BaseController {
   final RxDouble sliderValue = 0.0.obs;
@@ -46,9 +47,20 @@ class DeviceController extends BaseController {
       final response = await dio.get(
         buildUrl('/lights/toggle'),
       );
-      isLightOn.value = response.data['status'] ?? false;
+
+      // 验证响应数据格式
+      if (response.data is Map && response.data.containsKey('status')) {
+        final bool status = response.data['status'] == true;
+        isLightOn.value = status;
+      } else {
+        if (kDebugMode) {
+          print('无效的灯光状态响应: ${response.data}');
+        }
+      }
     } catch (e) {
-      Get.snackbar('Error', e.toString());
+      if (kDebugMode) {
+        print('切换灯光失败: $e');
+      }
     } finally {
       isLightButtonEnabled.value = true;
     }
