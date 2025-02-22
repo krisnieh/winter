@@ -4,12 +4,9 @@ import 'views/working_line/working_line_page.dart';
 import 'services/mqtt_service.dart';
 
 void main() async {
-  await initServices();
+  WidgetsFlutterBinding.ensureInitialized();
+  Get.put(MqttService()); // 直接注入服务，不需要等待初始化
   runApp(const MyApp());
-}
-
-Future<void> initServices() async {
-  await Get.putAsync(() => MqttService().init());
 }
 
 class MyApp extends StatelessWidget {

@@ -1,12 +1,20 @@
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:get/get.dart';
+import 'package:flutter/foundation.dart';
 
 class MqttService extends GetxService {
   static MqttService get instance => Get.find();
   late MqttServerClient _client;
+  final RxBool isConnected = false.obs;
 
-  Future<MqttService> init() async {
+  @override
+  void onInit() {
+    super.onInit();
+    _initMqtt();
+  }
+
+  Future<void> _initMqtt() async {
     _client = MqttServerClient.withPort(
       '172.16.0.8',
       'flutter_client_${DateTime.now().millisecondsSinceEpoch}',
@@ -20,16 +28,26 @@ class MqttService extends GetxService {
 
     try {
       await _client.connect();
+      isConnected.value = true;
+      if (kDebugMode) {
+        print('MQTT连接成功');
+      }
     } catch (e) {
-      Get.snackbar('Error', '连接MQTT服务器失败: ${e.toString()}');
+      if (kDebugMode) {
+        print('MQTT连接失败: $e');
+      }
     }
-
-    return this;
   }
 
   void subscribe(String topic, Function(String) onMessage) {
-    _client.subscribe(topic, MqttQos.atLeastOnce);
+    if (!isConnected.value) {
+      if (kDebugMode) {
+        print('MQTT未连接，无法订阅');
+      }
+      return;
+    }
 
+    _client.subscribe(topic, MqttQos.atLeastOnce);
     _client.updates?.listen((List<MqttReceivedMessage<MqttMessage>> c) {
       final message = c[0].payload as MqttPublishMessage;
       final payload =
@@ -40,7 +58,9 @@ class MqttService extends GetxService {
 
   @override
   void onClose() {
-    _client.disconnect();
+    if (isConnected.value) {
+      _client.disconnect();
+    }
     super.onClose();
   }
 }
