@@ -43,6 +43,7 @@ class DeviceController extends BaseController {
       );
     } catch (e) {
       Get.snackbar('Error', e.toString());
+      print('设置位置失败: $e');
     } finally {
       isSettingButtonEnabled.value = true;
     }
