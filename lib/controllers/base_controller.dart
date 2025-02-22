@@ -36,7 +36,8 @@ class BaseController extends GetxController {
 
   // 构建完整的API URL
   String buildUrl(String endpoint) {
-    return '/api/$equipment/$line/$unit/$endpoint'.replaceAll('//', '/');
+    return 'http://172.16.0.8:5000/api/$equipment/$line/$unit/$endpoint'
+        .replaceAll('//', '/');
   }
 
   // 构建MQTT主题
