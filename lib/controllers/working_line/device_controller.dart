@@ -21,7 +21,12 @@ class DeviceController extends BaseController {
       final response = await dio.get(buildUrl('/lights/status'));
       isLightOn.value = response.data['status'] ?? false;
     } catch (e) {
-      Get.snackbar('Error', '获取灯光状态失败: ${e.toString()}');
+      Get.snackbar(
+        'Error',
+        '获取灯光状态失败: ${e.toString()}',
+        duration: const Duration(seconds: 20),
+        snackPosition: SnackPosition.TOP,
+      );
     }
   }
 
