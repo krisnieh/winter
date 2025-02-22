@@ -35,7 +35,7 @@ class BaseController extends GetxController {
 
   // 构建完整的API URL
   String buildUrl(String endpoint) {
-    return 'http://172.16.0.8:5000/api/working_line/$line/$unit/$endpoint'
+    return 'http://172.16.0.7:5000/api/working_line/$line/$unit/$endpoint'
         .replaceAll('//', '/');
   }
 
