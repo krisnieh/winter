@@ -14,6 +14,7 @@ class DeviceController extends BaseController {
     super.onInit();
     initLightStatus();
     setupMqttSubscription();
+    setupSettingSubscription();
   }
 
   Future<void> initLightStatus() async {
@@ -35,8 +36,28 @@ class DeviceController extends BaseController {
     );
   }
 
+  void setupSettingSubscription() {
+    MqttService.instance.subscribe(
+      buildMqttTopic('go_finished'),
+      (payload) {
+        isSettingButtonEnabled.value = payload == "done";
+      },
+    );
+  }
+
   Future<void> setSliderValue() async {
     isSettingButtonEnabled.value = false;
+
+    // 添加30秒超时计时器
+    Future.delayed(const Duration(seconds: 30), () {
+      if (!isSettingButtonEnabled.value) {
+        isSettingButtonEnabled.value = true;
+        if (kDebugMode) {
+          print('设置位置操作超时');
+        }
+      }
+    });
+
     try {
       await dio.get(
         buildUrl('/set_position/${sliderValue.value}'),
@@ -44,8 +65,6 @@ class DeviceController extends BaseController {
     } catch (e) {
       Get.snackbar('Error', e.toString());
       print('设置位置失败: $e');
-    } finally {
-      isSettingButtonEnabled.value = true;
     }
   }
 
