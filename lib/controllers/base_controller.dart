@@ -44,6 +44,6 @@ class BaseController extends GetxController {
 
   // 构建MQTT主题
   String buildMqttTopic(String endpoint) {
-    return '$line/$unit/$endpoint';
+    return 'hsf/working_line/$line/$unit/$endpoint';
   }
 }

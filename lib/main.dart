@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'views/working_line/working_line_page.dart';
+import 'services/mqtt_service.dart';
 
-void main() {
+void main() async {
+  await initServices();
   runApp(const MyApp());
+}
+
+Future<void> initServices() async {
+  await Get.putAsync(() => MqttService().init());
 }
 
 class MyApp extends StatelessWidget {
