@@ -25,7 +25,8 @@ class MqttService extends GetxService {
     _client.useWebSocket = true;
     _client.port = 8083;
     _client.websocketProtocols = ['mqtt'];
-    _client.server = 'ws://172.16.0.8';
+    _client.server = '172.16.0.8';
+    _client.secure = false;
     _client.keepAlivePeriod = 20;
     _client.logging(on: false);
 
