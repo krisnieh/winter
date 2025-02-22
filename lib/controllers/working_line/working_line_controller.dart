@@ -20,9 +20,12 @@ class WorkingLineController extends BaseController {
 
   Future<void> query() async {
     try {
-      final response = await dio.get('/query', queryParameters: {
-        'value': inputValue.value,
-      });
+      final response = await dio.get(
+        buildUrl('/query'),
+        queryParameters: {
+          'value': inputValue.value,
+        },
+      );
       queryResult.value = response.data.toString();
     } catch (e) {
       queryResult.value = 'Error: $e';
