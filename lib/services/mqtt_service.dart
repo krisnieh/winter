@@ -17,7 +17,7 @@ class MqttService extends GetxService {
 
   Future<void> _initMqtt() async {
     _client = MqttServerClient.withPort(
-      '172.16.0.8', // 使用普通地址
+      'ws://172.16.0.8/mqtt', // 指定完整的 WebSocket 路径
       'flutter_client_${DateTime.now().millisecondsSinceEpoch}',
       8083,
     );
@@ -31,7 +31,7 @@ class MqttService extends GetxService {
             'flutter_client_${DateTime.now().millisecondsSinceEpoch}')
         .startClean();
     _client.keepAlivePeriod = 20;
-    _client.logging(on: false);
+    _client.logging(on: true); // 临时开启日志以便调试
 
     try {
       await _client.connect();
