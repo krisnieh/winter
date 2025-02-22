@@ -17,15 +17,19 @@ class MqttService extends GetxService {
 
   Future<void> _initMqtt() async {
     _client = MqttServerClient.withPort(
-      'ws://172.16.0.8',
+      '172.16.0.8', // 使用普通地址
       'flutter_client_${DateTime.now().millisecondsSinceEpoch}',
       8083,
     );
 
     _client.useWebSocket = true;
-    _client.port = 8083;
     _client.websocketProtocols = ['mqtt'];
     _client.secure = false;
+    _client.port = 8083;
+    _client.connectionMessage = MqttConnectMessage()
+        .withClientIdentifier(
+            'flutter_client_${DateTime.now().millisecondsSinceEpoch}')
+        .startClean();
     _client.keepAlivePeriod = 20;
     _client.logging(on: false);
 
