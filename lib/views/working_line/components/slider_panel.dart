@@ -21,7 +21,7 @@ class SliderPanel extends StatelessWidget {
                     min: 0,
                     max: 100,
                     divisions: 100,
-                    label: controller.sliderValue.value.round().toString(),
+                    label: controller.sliderValue.value.toStringAsFixed(0),
                     onChanged: (value) => controller.sliderValue.value = value,
                   )),
             ),
@@ -44,7 +44,7 @@ class SliderPanel extends StatelessWidget {
                         ? controller.setSliderValue
                         : null,
                     child: Text(
-                      controller.sliderValue.value.round().toString(),
+                      controller.sliderValue.value.toStringAsFixed(0),
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
