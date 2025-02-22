@@ -4,7 +4,6 @@ import 'dart:io';
 
 class BaseController extends GetxController {
   final Dio _dio = Dio();
-  late final String equipment;
   late final String line;
   late final String unit;
 
@@ -36,9 +35,7 @@ class BaseController extends GetxController {
 
   // 构建完整的API URL
   String buildUrl(String endpoint) {
-    equipment = 'working_line';
-
-    return 'http://172.16.0.8:5000/api/$equipment/$line/$unit/$endpoint'
+    return 'http://172.16.0.8:5000/api/working_line/$line/$unit/$endpoint'
         .replaceAll('//', '/');
   }
 
