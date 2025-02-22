@@ -38,7 +38,7 @@ class DeviceController extends BaseController {
   Future<void> setSliderValue() async {
     isSettingButtonEnabled.value = false;
     try {
-      await dio.post(
+      await dio.get(
         buildUrl('/set_position/${sliderValue.value}'),
       );
     } catch (e) {
