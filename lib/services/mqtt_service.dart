@@ -64,11 +64,22 @@ class MqttService extends GetxService {
 
   void _doSubscribe(String topic, Function(String) onMessage) {
     _client.subscribe(topic, MqttQos.atLeastOnce);
+
     _client.updates?.listen((List<MqttReceivedMessage<MqttMessage>> c) {
+      final recTopic = c[0].topic;
       final message = c[0].payload as MqttPublishMessage;
       final payload =
           MqttPublishPayload.bytesToStringAsString(message.payload.message);
-      onMessage(payload);
+
+      if (kDebugMode) {
+        print('收到MQTT消息:');
+        print('  主题: $recTopic');
+        print('  内容: $payload');
+      }
+
+      if (recTopic == topic) {
+        onMessage(payload);
+      }
     });
   }
 
