@@ -20,14 +20,14 @@ class BaseController extends GetxController {
       final hostname = Platform.localHostname; // 获取主机名
       final parts = hostname.split('-');
       if (parts.length >= 2) {
-        line = parts[parts.length - 2]; // 倒数第二个值
+        line = parts[parts.length - 2].toUpperCase(); // 转为大写
         unit = parts[parts.length - 1]; // 倒数第一个值
       } else {
-        line = 'unknown';
+        line = 'UNKNOWN';
         unit = 'unknown';
       }
     } catch (e) {
-      line = 'unknown';
+      line = 'UNKNOWN';
       unit = 'unknown';
       Get.snackbar('Error', '获取主机名失败: ${e.toString()}');
     }
