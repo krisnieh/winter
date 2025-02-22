@@ -31,6 +31,7 @@ class DeviceController extends BaseController {
     MqttService.instance.subscribe(
       buildMqttTopic('position'),
       (payload) {
+        print('position: $payload');
         sliderValue.value = double.parse(payload);
       },
     );
@@ -40,6 +41,7 @@ class DeviceController extends BaseController {
     MqttService.instance.subscribe(
       buildMqttTopic('go_finished'),
       (payload) {
+        print('go_finished: $payload');
         isSettingButtonEnabled.value = payload == "done";
       },
     );
