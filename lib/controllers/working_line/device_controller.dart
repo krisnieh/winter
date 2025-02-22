@@ -26,14 +26,20 @@ class DeviceController extends BaseController {
     }
   }
 
+  void setupMqttSubscription() {
+    MqttService.instance.subscribe(
+      buildMqttTopic('position'),
+      (payload) {
+        sliderValue.value = double.parse(payload);
+      },
+    );
+  }
+
   Future<void> setSliderValue() async {
     isSettingButtonEnabled.value = false;
     try {
       await dio.post(
-        buildUrl('/settings'),
-        data: {
-          'value': sliderValue.value,
-        },
+        buildUrl('/set_position/${sliderValue.value}'),
       );
     } catch (e) {
       Get.snackbar('Error', e.toString());
@@ -65,14 +71,5 @@ class DeviceController extends BaseController {
     } finally {
       isLightButtonEnabled.value = true;
     }
-  }
-
-  void setupMqttSubscription() {
-    MqttService.instance.subscribe(
-      buildMqttTopic('position'),
-      (payload) {
-        sliderValue.value = double.parse(payload);
-      },
-    );
   }
 }
