@@ -95,26 +95,10 @@ class LeftControlPanel extends StatelessWidget {
           const SizedBox(width: 16),
           FloatingActionButton(
             heroTag: 'fan',
-            onPressed: () {},
-            backgroundColor: Theme.of(context).primaryColor,
-            foregroundColor: Colors.white,
+            onPressed: null,
+            backgroundColor: Colors.grey[300],
+            foregroundColor: Colors.grey[600],
             child: const Icon(Icons.air),
-          ),
-          const SizedBox(width: 16),
-          FloatingActionButton(
-            heroTag: 'load',
-            onPressed: () {},
-            backgroundColor: Theme.of(context).colorScheme.secondary,
-            foregroundColor: Colors.white,
-            child: const Icon(Icons.download),
-          ),
-          const SizedBox(width: 16),
-          FloatingActionButton(
-            heroTag: 'upload',
-            onPressed: () {},
-            backgroundColor: Theme.of(context).colorScheme.secondary,
-            foregroundColor: Colors.white,
-            child: const Icon(Icons.upload),
           ),
           const SizedBox(width: 30),
           Container(
@@ -133,7 +117,7 @@ class LeftControlPanel extends StatelessWidget {
                   '灯光: ${controller.isLightOn.value ? "开启" : "关闭"}  ',
                   style: const TextStyle(color: Colors.white)
                 ),
-                const Text('风扇状态: -  ', style: TextStyle(color: Colors.white)),
+                const Text('风扇: -  ', style: TextStyle(color: Colors.white)),
                 const Text('环境湿度: -  ', style: TextStyle(color: Colors.white)),
                 const Text('环境温度: -', style: TextStyle(color: Colors.white)),
               ],

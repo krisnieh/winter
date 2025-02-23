@@ -27,7 +27,6 @@ class DeviceController extends BaseController {
 
   void setupPositionArrivedSubscription() {
     final topic = buildMqttTopic('/arrived');
-    print('topic: $topic');
     MqttService.instance.subscribe(
       topic,
       (payload) {
@@ -77,6 +76,8 @@ class DeviceController extends BaseController {
   }
 
   Future<void> setSliderValue() async {
+    if (!isSettingButtonEnabled.value) return;  // 如果当前有操作在进行，直接返回
+    
     isSettingButtonEnabled.value = false;
     final currentRequestId = DateTime.now().millisecondsSinceEpoch.toString();
     requestId.value = currentRequestId;
