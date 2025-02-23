@@ -17,6 +17,7 @@ class DeviceController extends BaseController {
   void onInit() {
     super.onInit();
     initLightStatus();
+    initPosition();
     setupPositionArrivedSubscription();
   }
 
@@ -41,6 +42,21 @@ class DeviceController extends BaseController {
     } catch (e) {
       Get.snackbar('Error', '获取灯光状态失败: ${e.toString()}');
       print('获取灯光状态失败: ${e.toString()}');
+    }
+  }
+
+  Future<void> initPosition() async {
+    try {
+      final response = await dio.get(buildUrl('/position'));
+      if (response.data is Map<String, dynamic>) {
+        final position = response.data['position'];
+        if (position != null) {
+          sliderValue.value = double.parse(position.toString());
+        }
+      }
+    } catch (e) {
+      Get.snackbar('Error', '获取初始位置失败: ${e.toString()}');
+      print('获取初始位置失败: $e');
     }
   }
 
