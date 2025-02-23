@@ -2,11 +2,14 @@ name: fig-app
 version: '1.0.0'
 summary: Fig Application
 description: |
-  Fig Application for Ubuntu
+  Fig Application for Ubuntu 22.04
 
 grade: stable
 confinement: classic
 base: core22
+architectures:
+  - build-on: amd64
+    run-on: amd64
 
 apps:
   fig-app:
