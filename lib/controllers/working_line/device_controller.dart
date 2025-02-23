@@ -1,20 +1,37 @@
 import '../base_controller.dart';
 import 'package:get/get.dart';
-import '../../services/mqtt_service.dart';
 import 'package:flutter/foundation.dart';
+import '../../services/mqtt_service.dart';
 
 class DeviceController extends BaseController {
   final RxDouble sliderValue = 0.0.obs;
   final RxBool isSettingButtonEnabled = true.obs;
   final RxBool isLightButtonEnabled = true.obs;
   final RxBool isLightOn = false.obs;
+  final RxString requestId = ''.obs;
+
+  // 添加一个变量来控制是否正在检测
+  bool _isCheckingLock = false;
 
   @override
   void onInit() {
     super.onInit();
     initLightStatus();
-    setupMqttSubscription();
-    setupSettingSubscription();
+    setupPositionArrivedSubscription();
+  }
+
+  void setupPositionArrivedSubscription() {
+    final topic = buildMqttTopic('/arrived');
+    print('topic: $topic');
+    MqttService.instance.subscribe(
+      topic,
+      (payload) {
+        if (payload == requestId.value) {
+          isSettingButtonEnabled.value = true;
+          requestId.value = '';
+        }
+      },
+    );
   }
 
   Future<void> initLightStatus() async {
@@ -27,57 +44,34 @@ class DeviceController extends BaseController {
     }
   }
 
-  void setupMqttSubscription() {
-    MqttService.instance.subscribe(
-      buildMqttTopic('position'),
-      (payload) {
-        print('position: $payload');
-        sliderValue.value = double.parse(payload);
-      },
-    );
-  }
-
-  void setupSettingSubscription() {
-    MqttService.instance.subscribe(
-      buildMqttTopic('go_finished'),
-      (payload) {
-        print('go_finished: $payload');
-        isSettingButtonEnabled.value = payload == "done";
-      },
-    );
-  }
-
   Future<void> setSliderValue() async {
     isSettingButtonEnabled.value = false;
+    final currentRequestId = DateTime.now().millisecondsSinceEpoch.toString();
+    requestId.value = currentRequestId;
 
     // 添加30秒超时计时器
     Future.delayed(const Duration(seconds: 30), () {
-      if (!isSettingButtonEnabled.value) {
+      if (!isSettingButtonEnabled.value && requestId.value == currentRequestId) {
         isSettingButtonEnabled.value = true;
-        if (kDebugMode) {
-          print('设置位置操作超时');
-        }
+        requestId.value = '';
       }
     });
 
     try {
-      await dio.get(
-        buildUrl('/set_position/${sliderValue.value}'),
-      );
+      final position = sliderValue.value.round();
+      await dio.get(buildUrl('/set_position/$position/$currentRequestId'));
     } catch (e) {
+      requestId.value = '';
+      isSettingButtonEnabled.value = true;
       Get.snackbar('Error', e.toString());
-      print('设置位置失败: $e');
     }
   }
 
   Future<void> toggleLight() async {
     isLightButtonEnabled.value = false;
     try {
-      final response = await dio.get(
-        buildUrl('/lights/toggle'),
-      );
+      final response = await dio.get(buildUrl('/lights/toggle'));
 
-      // 验证响应数据格式
       if (response.data is Map && response.data.containsKey('status')) {
         final bool status = response.data['status'] == true;
         isLightOn.value = status;

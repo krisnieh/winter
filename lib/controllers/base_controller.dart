@@ -40,6 +40,7 @@ class BaseController extends GetxController {
 
   // 构建MQTT主题
   String buildMqttTopic(String endpoint) {
-    return 'hsf/working_line/$line/$unit/$endpoint';
+    final randomId = DateTime.now().millisecondsSinceEpoch.toString();
+    return 'hsf/working_line/$line/$unit${endpoint}';
   }
 }

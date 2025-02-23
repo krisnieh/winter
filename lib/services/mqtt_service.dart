@@ -17,7 +17,7 @@ class MqttService extends GetxService {
 
   Future<void> _initMqtt() async {
     _client = MqttServerClient.withPort(
-      'ws://172.16.0.8/mqtt', // 指定完整的 WebSocket 路径
+      'ws://172.16.0.8/mqtt',
       'flutter_client_${DateTime.now().millisecondsSinceEpoch}',
       8083,
     );
@@ -31,20 +31,14 @@ class MqttService extends GetxService {
             'flutter_client_${DateTime.now().millisecondsSinceEpoch}')
         .startClean();
     _client.keepAlivePeriod = 20;
-    _client.logging(on: true); // 临时开启日志以便调试
+    _client.logging(on: false); // 关闭日志
 
     try {
       await _client.connect();
       isConnected.value = true;
-      if (kDebugMode) {
-        print('MQTT连接成功');
-      }
       // 连接成功后重新订阅
       _resubscribe();
     } catch (e) {
-      if (kDebugMode) {
-        print('MQTT连接失败: $e');
-      }
       // 尝试重新连接
       Future.delayed(const Duration(seconds: 5), _initMqtt);
     }
@@ -55,10 +49,6 @@ class MqttService extends GetxService {
 
     if (isConnected.value) {
       _doSubscribe(topic, onMessage);
-    } else {
-      if (kDebugMode) {
-        print('MQTT未连接，订阅将在连接后进行');
-      }
     }
   }
 
@@ -70,12 +60,6 @@ class MqttService extends GetxService {
       final message = c[0].payload as MqttPublishMessage;
       final payload =
           MqttPublishPayload.bytesToStringAsString(message.payload.message);
-
-      if (kDebugMode) {
-        print('收到MQTT消息:');
-        print('  主题: $recTopic');
-        print('  内容: $payload');
-      }
 
       if (recTopic == topic) {
         onMessage(payload);
