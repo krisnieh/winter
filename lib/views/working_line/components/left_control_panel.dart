@@ -9,18 +9,77 @@ class LeftControlPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<DeviceController>(); // 获取controller实例
 
+    Future<void> showCallConfirmDialog() async {
+      final result = await Get.dialog<bool>(
+        AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          title: const Text(
+            '呼叫质量支持',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: const Text(
+            '所有呼叫将会记录在系统，并且可能用工作评估，是否确认继续？',
+            style: TextStyle(fontSize: 20),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Get.back(result: false),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                '取消',
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Get.back(result: true),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                '确认',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.red,
+                ),
+              ),
+            ),
+          ],
+          actionsPadding: const EdgeInsets.all(16),
+        ),
+      );
+
+      if (result == true) {
+        controller.triggerCall();
+      }
+    }
+
     return Positioned(
       left: 16,
       bottom: 16,
       child: Row(
         children: [
-          FloatingActionButton(
-            heroTag: 'call',
-            onPressed: () {},
-            backgroundColor: Colors.red[600],
-            foregroundColor: Colors.white,
-            child: const Icon(Icons.call),
-          ),
+          Obx(() => FloatingActionButton(
+                heroTag: 'call',
+                onPressed: controller.isCallButtonEnabled.value
+                    ? showCallConfirmDialog
+                    : null,
+                backgroundColor: Colors.red[600],
+                foregroundColor: Colors.white,
+                child: const Icon(Icons.call),
+              )),
           const SizedBox(width: 16),
           Obx(() => FloatingActionButton(
                 heroTag: 'light',
@@ -61,18 +120,24 @@ class LeftControlPanel extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.black.withAlpha(153),
+              color: Colors.black.withAlpha(100),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Row(
+            child: Obx(() => Row(
               children: [
-                Text('操作台高度: 75cm  ', style: TextStyle(color: Colors.white)),
-                Text('灯光状态: 开启  ', style: TextStyle(color: Colors.white)),
-                Text('风扇状态: -  ', style: TextStyle(color: Colors.white)),
-                Text('环境湿度: -  ', style: TextStyle(color: Colors.white)),
-                Text('环境温度: -', style: TextStyle(color: Colors.white)),
+                Text(
+                  '操作台: ${controller.sliderValue.value.round()}%  ',
+                  style: const TextStyle(color: Colors.white)
+                ),
+                Text(
+                  '灯光: ${controller.isLightOn.value ? "开启" : "关闭"}  ',
+                  style: const TextStyle(color: Colors.white)
+                ),
+                const Text('风扇状态: -  ', style: TextStyle(color: Colors.white)),
+                const Text('环境湿度: -  ', style: TextStyle(color: Colors.white)),
+                const Text('环境温度: -', style: TextStyle(color: Colors.white)),
               ],
-            ),
+            )),
           ),
         ],
       ),

@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../../controllers/working_line/device_controller.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: Theme.of(context).primaryColor,
+    final controller = Get.find<DeviceController>();
+
+    return Obx(() => AppBar(
+      backgroundColor: controller.isCallButtonEnabled.value 
+          ? Theme.of(context).primaryColor 
+          : Colors.red,
       foregroundColor: Colors.white,
       title: Row(
         children: [
@@ -29,7 +35,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
       automaticallyImplyLeading: false,
-    );
+    ));
   }
 
   @override

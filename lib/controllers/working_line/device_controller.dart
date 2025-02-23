@@ -2,6 +2,7 @@ import '../base_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart';
 import '../../services/mqtt_service.dart';
+import 'package:dio/dio.dart';
 
 class DeviceController extends BaseController {
   final RxDouble sliderValue = 0.0.obs;
@@ -9,6 +10,8 @@ class DeviceController extends BaseController {
   final RxBool isLightButtonEnabled = true.obs;
   final RxBool isLightOn = false.obs;
   final RxString requestId = ''.obs;
+  final RxString callRequestId = ''.obs;
+  final RxBool isCallButtonEnabled = true.obs;
 
   // 添加一个变量来控制是否正在检测
   bool _isCheckingLock = false;
@@ -19,6 +22,7 @@ class DeviceController extends BaseController {
     initLightStatus();
     initPosition();
     setupPositionArrivedSubscription();
+    setupCallArrivedSubscription();
   }
 
   void setupPositionArrivedSubscription() {
@@ -30,6 +34,18 @@ class DeviceController extends BaseController {
         if (payload == requestId.value) {
           isSettingButtonEnabled.value = true;
           requestId.value = '';
+        }
+      },
+    );
+  }
+
+  void setupCallArrivedSubscription() {
+    MqttService.instance.subscribe(
+      buildMqttTopic('/alert/deactived'),
+      (payload) {
+        if (payload == callRequestId.value) {
+          isCallButtonEnabled.value = true;
+          callRequestId.value = '';
         }
       },
     );
@@ -102,6 +118,26 @@ class DeviceController extends BaseController {
       }
     } finally {
       isLightButtonEnabled.value = true;
+    }
+  }
+
+  Future<void> triggerCall() async {
+    isCallButtonEnabled.value = false;
+    final currentRequestId = DateTime.now().millisecondsSinceEpoch.toString();
+    callRequestId.value = currentRequestId;
+
+    try {
+      await dio.get(
+        buildUrl('/alert/active/$currentRequestId'),
+        options: Options(
+          sendTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+        ),
+      );
+    } catch (e) {
+      callRequestId.value = '';
+      isCallButtonEnabled.value = true;
+      Get.snackbar('Error', e.toString());
     }
   }
 }
