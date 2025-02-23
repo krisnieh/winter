@@ -1,0 +1,29 @@
+name: fig-app
+version: '1.0.0'
+summary: Fig Application
+description: |
+  Fig Application for Ubuntu
+
+grade: stable
+confinement: classic
+base: core22
+
+apps:
+  fig-app:
+    command: fig
+    extensions: [gnome]
+    plugs:
+      - network
+      - x11
+      - opengl
+      - hardware-observe
+      - system-observe
+
+parts:
+  fig-app:
+    plugin: dump
+    source: build/linux/x64/release/bundle/
+    override-build: |
+      craftctl default
+      mkdir -p $SNAPCRAFT_PART_INSTALL/bin/
+      cp -r * $SNAPCRAFT_PART_INSTALL/bin/ 
