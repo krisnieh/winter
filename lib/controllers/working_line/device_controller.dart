@@ -83,7 +83,7 @@ class DeviceController extends BaseController {
     requestId.value = currentRequestId;
 
     // 添加30秒超时计时器
-    Future.delayed(const Duration(seconds: 30), () {
+    Future.delayed(const Duration(seconds: 10), () {
       if (!isSettingButtonEnabled.value && requestId.value == currentRequestId) {
         isSettingButtonEnabled.value = true;
         requestId.value = '';
