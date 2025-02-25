@@ -127,9 +127,21 @@ class DeviceController extends BaseController {
     final currentRequestId = DateTime.now().millisecondsSinceEpoch.toString();
     callRequestId.value = currentRequestId;
 
+    // 添加30秒超时计时器
+    Future.delayed(const Duration(seconds: 30), () {
+      if (!isCallButtonEnabled.value && callRequestId.value == currentRequestId) {
+        isCallButtonEnabled.value = true;
+        callRequestId.value = '';
+        if (kDebugMode) {
+          print('呼叫操作超时: $currentRequestId');
+        }
+      }
+    });
+
     try {
+      final url = buildUrl('/alert/active/$currentRequestId');
       await dio.get(
-        buildUrl('/alert/active/$currentRequestId'),
+        url,
         options: Options(
           sendTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
