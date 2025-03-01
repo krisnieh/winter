@@ -143,9 +143,9 @@ class AdminPage extends StatelessWidget {
                         Get.dialog(
                           Dialog(
                             child: Container(
-                              width: 400,
-                              height: 600,
-                              padding: const EdgeInsets.all(16),
+                              width: 500,
+                              height: 700,
+                              padding: const EdgeInsets.all(24),
                               child: Column(
                                 children: [
                                   const Text(
@@ -155,30 +155,32 @@ class AdminPage extends StatelessWidget {
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  const SizedBox(height: 16),
-                                  NumberKeypad(
-                                    inputValue: controller.liftHeightInput,
-                                    onNumberPressed: (value) {
-                                      final currentValue = controller.liftHeightInput.value;
-                                      if (currentValue.length < 5) {
-                                        controller.liftHeightInput.value += value;
-                                      }
-                                    },
-                                    onDelete: () {
-                                      if (controller.liftHeightInput.value.isNotEmpty) {
-                                        controller.liftHeightInput.value = controller.liftHeightInput.value
-                                            .substring(0, controller.liftHeightInput.value.length - 1);
-                                      }
-                                    },
-                                    onSearch: () {
-                                      final number = double.tryParse(controller.liftHeightInput.value);
-                                      if (number != null && number >= 5 && number <= 100) {
-                                        controller.liftHeightController.text = controller.liftHeightInput.value;
-                                        Get.back();
-                                      } else {
-                                        Get.snackbar('提示', '请输入5-100之间的数值');
-                                      }
-                                    },
+                                  const SizedBox(height: 24),
+                                  Expanded(
+                                    child: NumberKeypad(
+                                      inputValue: controller.liftHeightInput,
+                                      onNumberPressed: (value) {
+                                        final currentValue = controller.liftHeightInput.value;
+                                        if (currentValue.length < 5) {
+                                          controller.liftHeightInput.value += value;
+                                        }
+                                      },
+                                      onDelete: () {
+                                        if (controller.liftHeightInput.value.isNotEmpty) {
+                                          controller.liftHeightInput.value = controller.liftHeightInput.value
+                                              .substring(0, controller.liftHeightInput.value.length - 1);
+                                        }
+                                      },
+                                      onSearch: () {
+                                        final number = double.tryParse(controller.liftHeightInput.value);
+                                        if (number != null && number >= 5 && number <= 100) {
+                                          controller.liftHeightController.text = controller.liftHeightInput.value;
+                                          Get.back();
+                                        } else {
+                                          Get.snackbar('提示', '请输入5-100之间的数值');
+                                        }
+                                      },
+                                    ),
                                   ),
                                 ],
                               ),

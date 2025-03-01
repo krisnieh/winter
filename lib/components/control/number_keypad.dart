@@ -17,71 +17,72 @@ class NumberKeypad extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      flex: 4,
-      child: Column(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Container(
-              alignment: Alignment.center,
-              margin: const EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.lightBlue[50],
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Obx(() => Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        inputValue.value,
-                        style: const TextStyle(fontSize: 70),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        '${inputValue.value.length}/11',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  )),
+    return Column(
+      children: [
+        Expanded(
+          flex: 2,
+          child: Container(
+            alignment: Alignment.center,
+            margin: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.lightBlue[50],
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(10),
             ),
-          ),
-          Expanded(
-            flex: 5,
-            child: GridView.count(
-              padding: const EdgeInsets.all(16),
-              crossAxisCount: 3,
-              childAspectRatio: 1.5,
-              children: [
-                ...List.generate(
-                  9,
-                  (index) => NumberButton(
-                    number: (index + 1).toString(),
-                    onPressed: () => onNumberPressed((index + 1).toString()),
+            child: Obx(() => FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    inputValue.value,
+                    style: const TextStyle(fontSize: 70),
+                    textAlign: TextAlign.center,
                   ),
-                ),
-                NumberButton(
-                  icon: Icons.backspace,
-                  onPressed: onDelete,
-                ),
-                NumberButton(
-                  number: '0',
-                  onPressed: () => onNumberPressed('0'),
-                ),
-                NumberButton(
-                  icon: Icons.search,
-                  onPressed: onSearch,
-                ),
-              ],
-            ),
+                  Text(
+                    '${inputValue.value.length}/11',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            )),
           ),
-        ],
-      ),
+        ),
+        Expanded(
+          flex: 5,
+          child: GridView.count(
+            padding: const EdgeInsets.all(16),
+            crossAxisCount: 3,
+            childAspectRatio: 1.5,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
+            children: [
+              ...List.generate(
+                9,
+                (index) => NumberButton(
+                  number: (index + 1).toString(),
+                  onPressed: () => onNumberPressed((index + 1).toString()),
+                ),
+              ),
+              NumberButton(
+                icon: Icons.backspace,
+                onPressed: onDelete,
+              ),
+              NumberButton(
+                number: '0',
+                onPressed: () => onNumberPressed('0'),
+              ),
+              NumberButton(
+                icon: Icons.keyboard_return,
+                onPressed: onSearch,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
