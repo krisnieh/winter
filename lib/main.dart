@@ -6,6 +6,7 @@ import 'package:flutter_fullscreen/flutter_fullscreen.dart';
 import 'views/testing_line/testing_line_page.dart';
 import 'dart:io';
 import 'controllers/config_controller.dart';
+import 'views/admin/admin_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,6 +38,8 @@ String getInitialRoute(ConfigController config) {
     }
   } else if (config.line.value == 'WL') {
     return '/working/unit';
+  } else if (config.line.value == 'ADMIN') {
+    return '/admin';
   }
   return '/working/unit';
 }
@@ -58,6 +61,7 @@ class MyApp extends StatelessWidget {
       getPages: [
         GetPage(name: '/working/unit', page: () => const WorkingLinePage()),
         GetPage(name: '/testing/unit', page: () => const TestingLinePage()),
+        GetPage(name: '/admin', page: () => const AdminPage()),
       ],
       initialRoute: initialRoute,
     );

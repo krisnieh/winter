@@ -32,19 +32,9 @@ class ConfigController extends GetxController {
   String getLineName() {
     switch (line.value) {
       case 'TL':
-        final type = parts[2].toUpperCase();
-        final unit = parts[3].toUpperCase();
-        final name = parts[4].toUpperCase();
-        switch (type) {
-          case 'UNIT':
-            return '检测单元-$name';
-          case 'PREPARE':
-            return '准备单元-$name';
-          case 'LIFT':
-            return '升降机-$name';
-        }
+        return 'testing_line';
       case 'WL':
-        return '加工线';
+        return 'working_line';
       case 'AD':
         return '仓储';
       case 'QC':
@@ -57,7 +47,7 @@ class ConfigController extends GetxController {
         final name = parts[2].toUpperCase();
         return '系统管理-$name';
       default:
-        return '';
+        return 'working_line';
     }
   }
 

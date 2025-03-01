@@ -12,6 +12,7 @@ class DeviceController extends BaseController {
   final RxString requestId = ''.obs;
   final RxString callRequestId = ''.obs;
   final RxBool isCallButtonEnabled = true.obs;
+  final RxString inputValue = ''.obs;
 
   // 添加一个变量来控制是否正在检测
   bool _isCheckingLock = false;
@@ -152,5 +153,21 @@ class DeviceController extends BaseController {
       isCallButtonEnabled.value = true;
       Get.snackbar('Error', e.toString());
     }
+  }
+
+  void handleNumberPressed(String number) {
+    if (inputValue.value.length < 11) {
+      inputValue.value += number;
+    }
+  }
+
+  void handleDelete() {
+    if (inputValue.value.isNotEmpty) {
+      inputValue.value = inputValue.value.substring(0, inputValue.value.length - 1);
+    }
+  }
+
+  void handleSearch() {
+    print('搜索: ${inputValue.value}');
   }
 }

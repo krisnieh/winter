@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../components/base_components.dart';
-import 'components/left_control_panel.dart';
-import 'components/main_content.dart';
-import 'components/number_keypad.dart';
-import 'components/slider_panel.dart';
-import '../../controllers/working_line/working_line_controller.dart';
 import '../../controllers/working_line/device_controller.dart';
 
 class WorkingLinePage extends StatelessWidget {
@@ -13,27 +8,66 @@ class WorkingLinePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final workingLineController = Get.put(WorkingLineController());
-    final deviceController = Get.put(DeviceController());
+    final controller = Get.find<DeviceController>();
 
     return Scaffold(
       appBar: CustomAppBar(
-        isCallButtonEnabled: deviceController.isCallButtonEnabled,
+        isCallButtonEnabled: controller.isCallButtonEnabled,
       ),
       body: Stack(
         children: [
           Row(
             children: [
-              MainContent(controller: workingLineController),
-              NumberKeypad(controller: workingLineController),
+              NumberKeypad(
+                inputValue: controller.inputValue,
+                onNumberPressed: controller.handleNumberPressed,
+                onDelete: controller.handleDelete,
+                onSearch: controller.handleSearch,
+              ),
               SliderPanel(
-                sliderValue: deviceController.sliderValue,
-                isSettingButtonEnabled: deviceController.isSettingButtonEnabled,
-                onSetValue: deviceController.setSliderValue,
+                sliderValue: controller.sliderValue,
+                isSettingButtonEnabled: controller.isSettingButtonEnabled,
+                onSetValue: controller.setSliderValue,
               ),
             ],
           ),
-          const LeftControlPanel(),
+          Positioned(
+            left: 16,
+            bottom: 16,
+            child: Row(
+              children: [
+                Obx(() => FloatingActionButton(
+                      heroTag: 'call',
+                      onPressed: controller.isCallButtonEnabled.value
+                          ? controller.triggerCall
+                          : null,
+                      backgroundColor: Colors.red[600],
+                      foregroundColor: Colors.white,
+                      child: const Icon(Icons.call),
+                    )),
+                const SizedBox(width: 16),
+                Obx(() => FloatingActionButton(
+                      heroTag: 'light',
+                      onPressed: controller.isLightButtonEnabled.value
+                          ? controller.toggleLight
+                          : null,
+                      backgroundColor: controller.isLightOn.value
+                          ? Colors.amber[700]
+                          : Colors.grey[300],
+                      foregroundColor: Colors.white,
+                      child: const Icon(Icons.lightbulb),
+                    )),
+                const SizedBox(width: 16),
+                FloatingActionButton(
+                  heroTag: 'fan',
+                  onPressed: null,
+                  backgroundColor: Colors.grey[300],
+                  foregroundColor: Colors.grey[600],
+                  child: const Icon(Icons.air),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

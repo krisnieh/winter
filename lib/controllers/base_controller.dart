@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'dart:io';
-import 'package:hsf_app/controllers/config_controller.dart';
+import '../controllers/config_controller.dart';
 
 class BaseController extends GetxController {
   static const url = 'http://172.16.0.7:5000/api';
