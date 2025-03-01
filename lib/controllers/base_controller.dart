@@ -1,47 +1,31 @@
 import 'package:get/get.dart';
 import 'package:dio/dio.dart';
 import 'dart:io';
+import 'package:hsf_app/controllers/config_controller.dart';
 
 class BaseController extends GetxController {
   static const url = 'http://172.16.0.7:5000/api';
 
   final Dio _dio = Dio();
-  late final List<String> parts;
-  late final String map;
+  final config = Get.find<ConfigController>();
 
   Dio get dio => _dio;
 
   @override
   void onInit() {
     super.onInit();
-    _parseHostname();
-  }
-
-  void _parseHostname() {
-    try {
-      final hostname = Platform.localHostname; // 获取主机名
-      parts = hostname.split('-');
-      map = parts[1];
-    } catch (e) {
-      Get.snackbar('Error', '获取主机名失败: ${e.toString()}');
-    }
   }
 
   // 构建完整的API URL
   String buildUrl(String endpoint) {
-    switch (map) {
-      case 'wl':
-        final prefix = 'working_line';
-        final line = parts[parts.length - 2].toUpperCase(); // 转为大写
-        final unit = parts[parts.length - 1]; // 倒数第一个值
-        return '$url/$prefix/$line/$unit$endpoint';
-      case 'tl':
-        final prefix = 'testing_line';
-        final type = parts[2]; // 类型
-        switch (type) {
+    final prefix = config.getApiPrefix();
+    switch (config.line.value) {
+      case 'WL':
+        return '$url/$prefix/${config.unit.value}$endpoint';
+      case 'TL':
+        switch (config.type.value) {
           case 'unit':
-            final unit = parts[parts.length - 1].toUpperCase(); // 倒数第一个值
-            return '$url/$prefix/unit/$unit$endpoint';
+            return '$url/$prefix/unit/${config.unit.value}$endpoint';
           case 'prepare':
             return '$url/$prefix/prepare$endpoint';
           case 'lift':
@@ -50,19 +34,12 @@ class BaseController extends GetxController {
             return '$url/$prefix/belt$endpoint';
         }
     }
+    return '';
   }
 
   // 构建MQTT主题
   String buildMqttTopic(String endpoint) {
-    switch (map) {
-      case 'wl':
-        final prefix = 'working_line';
-        final line = parts[parts.length - 2].toUpperCase(); // 转为大写
-        final unit = parts[parts.length - 1]; // 倒数第一个值
-        return 'hsf/$prefix/$line/$unit${endpoint}';
-      case 'tl':
-        final prefix = 'testing_line';
-        return 'hsf/$prefix/${endpoint}';
-    }
+    final prefix = config.getMqttPrefix();
+    return '$prefix/${config.unit.value}$endpoint';
   }
 }

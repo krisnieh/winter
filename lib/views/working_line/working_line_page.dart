@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'components/custom_app_bar.dart';
+import '../../components/base_components.dart';
 import 'components/left_control_panel.dart';
 import 'components/main_content.dart';
 import 'components/number_keypad.dart';
@@ -17,14 +17,20 @@ class WorkingLinePage extends StatelessWidget {
     final deviceController = Get.put(DeviceController());
 
     return Scaffold(
-      appBar: const CustomAppBar(),
+      appBar: CustomAppBar(
+        isCallButtonEnabled: deviceController.isCallButtonEnabled,
+      ),
       body: Stack(
         children: [
           Row(
             children: [
               MainContent(controller: workingLineController),
               NumberKeypad(controller: workingLineController),
-              SliderPanel(controller: deviceController),
+              SliderPanel(
+                sliderValue: deviceController.sliderValue,
+                isSettingButtonEnabled: deviceController.isSettingButtonEnabled,
+                onSetValue: deviceController.setSliderValue,
+              ),
             ],
           ),
           const LeftControlPanel(),

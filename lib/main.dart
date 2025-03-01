@@ -5,38 +5,39 @@ import 'services/mqtt_service.dart';
 import 'package:flutter_fullscreen/flutter_fullscreen.dart';
 import 'views/testing_line/testing_line_page.dart';
 import 'dart:io';
+import 'controllers/config_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FullScreen.ensureInitialized();
   FullScreen.setFullScreen(true);
+  
+  // 初始化全局配置
+  Get.put(ConfigController());
   Get.put(MqttService());
 
   // 获取主机名并决定初始路由
-  final String hostname = Platform.localHostname;
-  final String initialRoute = getInitialRoute(hostname);
+  final config = Get.find<ConfigController>();
+  final String initialRoute = getInitialRoute(config);
   
   runApp(MyApp(initialRoute: initialRoute));
 }
 
-String getInitialRoute(String hostname) {
-  final parts = hostname.split('-');
-  if (parts.length >= 2) {
-    final map = parts[1].toLowerCase();
-    final type = parts[2];
-    if (map == 'tl') {
-      if (type == 'unit') {
+String getInitialRoute(ConfigController config) {
+  if (config.line.value == 'TL') {
+    switch (config.type.value) {
+      case 'unit':
         return '/testing/unit';
-      } else if (type == 'prepare') {
+      case 'prepare':
         return '/testing/prepare';
-      } else if (type == 'lift') {
+      case 'lift':
         return '/testing/lift';
-      }
-    } else if (map == 'wl') {
-      return '/working/unit';
+      case 'belt':
+        return '/testing/belt';
     }
+  } else if (config.line.value == 'WL') {
+    return '/working/unit';
   }
-  // 默认路由
   return '/working/unit';
 }
 
