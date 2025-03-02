@@ -3,11 +3,12 @@ import 'package:get/get.dart';
 import 'views/working_line/working_line_page.dart';
 import 'services/mqtt_service.dart';
 import 'package:flutter_fullscreen/flutter_fullscreen.dart';
-// import 'views/testing_line/testing_line_page.dart';
+import 'views/testing_line/testing_line_page.dart';
 import 'dart:io';
 import 'controllers/config_controller.dart';
 // import 'views/admin/admin_page.dart';
 import 'controllers/working_line/working_line_device_controller.dart';
+import 'controllers/testing_line/testing_line_device_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +19,7 @@ void main() async {
   Get.put(ConfigController());
   Get.put(MqttService());
   Get.put(WorkingLineDeviceController());
+  Get.put(TestingLineDeviceController());
 
   // 获取主机名并决定初始路由
   final config = Get.find<ConfigController>();
@@ -28,14 +30,15 @@ void main() async {
 
 String getInitialRoute(ConfigController config) {
   if (config.line.value == 'TL') {
-    switch (config.type.value) {
-      case 'unit':
+    final type = config.parts.value[2].toUpperCase();
+    switch (type) {
+      case 'UNIT':
         return '/testing/unit';
-      case 'prepare':
+      case 'PREPARE':
         return '/testing/prepare';
-      case 'lift':
+      case 'LIFT':
         return '/testing/lift';
-      case 'belt':
+      case 'BELT':
         return '/testing/belt';
     }
   } else if (config.line.value == 'WL') {
@@ -62,7 +65,7 @@ class MyApp extends StatelessWidget {
       ),
       getPages: [
         GetPage(name: '/working/unit', page: () => const WorkingLinePage()),
-        // GetPage(name: '/testing/unit', page: () => const TestingLinePage()),
+        GetPage(name: '/testing/unit', page: () => const TestingLinePage()),
         // GetPage(name: '/admin', page: () => const AdminPage()),
       ],
       initialRoute: initialRoute,
