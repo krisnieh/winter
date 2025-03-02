@@ -15,7 +15,7 @@ class JudgeContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final configController = Get.find<ConfigController>();
-    final unitNumber = configController.getLineName(); // 获取单元编号
+    final unitNumber = configController.getLineName().replaceAll(' ', ''); // 获取单元编号
 
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -89,13 +89,12 @@ class JudgeContent extends StatelessWidget {
                     child: ListView(
                       children: [
                         _buildParameterItem('单元编号', unitNumber),  // 使用从配置获取的单元编号
+                        _buildParameterItem('1号端口气压', '- kPa'),
+                        _buildParameterItem('1号端口加压时间', '- s'),
+                        _buildParameterItem('2号端口气压', '- kPa'),
+                        _buildParameterItem('2号端口加压时间', '- s'),
                         _buildParameterItem('单元水深', '- mm'),
                         _buildParameterItem('单元浑浊度', '- NTU'),
-                        _buildParameterItem('单元水状态', '-'),
-                        _buildParameterItem('1号气压', '- kPa'),
-                        _buildParameterItem('2号气压', '- kPa'),
-                        _buildParameterItem('加压时间', '- s'),
-                        _buildParameterItem('持续时间', '- s'),
                         _buildParameterItem('水系统深度', '- mm'),
                         _buildParameterItem('水系统浑浊度', '- NTU'),
                       ],
@@ -118,16 +117,16 @@ class JudgeContent extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w500,
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
             ),
           ),
           const Spacer(),
           Text(
             value,
             style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey[700],
+              fontSize: 20,              
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],
