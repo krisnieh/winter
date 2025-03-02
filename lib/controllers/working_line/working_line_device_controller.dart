@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter/foundation.dart';
 import '../../services/mqtt_service.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 
 class WorkingLineDeviceController extends BaseController {
   final RxDouble wlSliderValue = 0.0.obs;
@@ -103,33 +104,90 @@ class WorkingLineDeviceController extends BaseController {
   }
 
   Future<void> triggerCall() async {
-    isWLCallButtonEnabled.value = false;
-    final currentRequestId = DateTime.now().millisecondsSinceEpoch.toString();
-    wlCallRequestId.value = currentRequestId;
-
-    Future.delayed(const Duration(seconds: 30), () {
-      if (!isWLCallButtonEnabled.value && wlCallRequestId.value == currentRequestId) {
-        isWLCallButtonEnabled.value = true;
-        wlCallRequestId.value = '';
-        if (kDebugMode) {
-          print('呼叫操作超时: $currentRequestId');
-        }
-      }
-    });
-
-    try {
-      final url = buildUrl('/alert/active/$currentRequestId');
-      await dio.get(
-        url,
-        options: Options(
-          sendTimeout: const Duration(seconds: 30),
-          receiveTimeout: const Duration(seconds: 30),
+    // 首先显示确认对话框
+    final result = await Get.dialog<bool>(
+      AlertDialog(
+        title: const Text(
+          '呼叫质检支持',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      );
-    } catch (e) {
-      wlCallRequestId.value = '';
-      isWLCallButtonEnabled.value = true;
-      Get.snackbar('Error', e.toString());
+        content: const Text(
+          '所有呼叫将会被记录，并用于工作评估，请确认是否发起？',
+          style: TextStyle(
+            fontSize: 20,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text(
+              '取消',
+              style: TextStyle(
+                fontSize: 18,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Get.back(result: true),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text(
+              '确定',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+        actionsPadding: const EdgeInsets.all(16),
+      ),
+    );
+
+    // 只有在用户确认后才执行呼叫
+    if (result == true) {
+      isWLCallButtonEnabled.value = false;
+      final currentRequestId = DateTime.now().millisecondsSinceEpoch.toString();
+      wlCallRequestId.value = currentRequestId;
+
+      Future.delayed(const Duration(seconds: 30), () {
+        if (!isWLCallButtonEnabled.value && wlCallRequestId.value == currentRequestId) {
+          isWLCallButtonEnabled.value = true;
+          wlCallRequestId.value = '';
+          if (kDebugMode) {
+            print('呼叫操作超时: $currentRequestId');
+          }
+        }
+      });
+
+      try {
+        final url = buildUrl('/alert/active/$currentRequestId');
+        await dio.get(
+          url,
+          options: Options(
+            sendTimeout: const Duration(seconds: 30),
+            receiveTimeout: const Duration(seconds: 30),
+          ),
+        );
+      } catch (e) {
+        wlCallRequestId.value = '';
+        isWLCallButtonEnabled.value = true;
+        Get.snackbar('Error', e.toString());
+      }
     }
   }
 
@@ -147,5 +205,25 @@ class WorkingLineDeviceController extends BaseController {
 
   void handleSearch() {
     print('搜索: ${wlInputValue.value}');
+  }
+
+  Future<void> setPosition(String value) async {
+    final currentRequestId = DateTime.now().millisecondsSinceEpoch.toString();
+    wlRequestId.value = currentRequestId;
+    
+    try {
+      final url = buildUrl('/set_position/$value/$currentRequestId');
+      await dio.get(
+        url,
+        options: Options(
+          sendTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+        ),
+      );
+    } catch (e) {
+      wlRequestId.value = '';
+      isWLSettingButtonEnabled.value = true;
+      throw e;  // 向上传递错误
+    }
   }
 }

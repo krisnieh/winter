@@ -21,17 +21,16 @@ class BaseController extends GetxController {
     final prefix = config.getApiPrefix();
     switch (config.line.value) {
       case 'WL':
-        return '$url/$prefix/${config.unit.value}$endpoint';
+        final list = config.parts.value[2].toUpperCase();
+        final unit = config.parts.value[3];
+        return '$url/working_line/$list/$unit$endpoint';
       case 'TL':
         switch (config.type.value) {
           case 'unit':
-            return '$url/$prefix/unit/${config.unit.value}$endpoint';
+            final unit = config.parts.value[3].toUpperCase();
+            return '$url/testing_line/unit/$unit$endpoint';
           case 'prepare':
-            return '$url/$prefix/prepare$endpoint';
-          case 'lift':
-            return '$url/$prefix/lift$endpoint';
-          case 'belt':
-            return '$url/$prefix/belt$endpoint';
+            return '$url/testing_line/prepare$endpoint';
         }
     }
     return '';
@@ -40,6 +39,15 @@ class BaseController extends GetxController {
   // 构建MQTT主题
   String buildMqttTopic(String endpoint) {
     final prefix = config.getMqttPrefix();
-    return '$prefix/${config.unit.value}$endpoint';
+    switch (config.line.value) {
+      case 'WL':
+        final list = config.parts.value[2].toUpperCase();
+        final unit = config.parts.value[3];
+        return '$prefix/$list/$unit$endpoint';
+      case 'TL':
+        final unit = config.parts.value[3].toUpperCase();
+        return '$prefix/unit/$unit$endpoint';
+    }
+    return '';
   }
 }
