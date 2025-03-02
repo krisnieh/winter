@@ -12,8 +12,8 @@ class BottomControlBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 5, 5, 5),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
-        border: Border(top: BorderSide(color: Colors.grey[300]!)),
+        // color: Colors.grey[50],  // 移除背景色
+        // border: Border(top: BorderSide(color: Colors.grey[50]!)),
       ),
       child: Row(
         children: [
@@ -74,21 +74,21 @@ class BottomControlBar extends StatelessWidget {
                     )
                   ),
                   Text(
-                    '| 环境湿度: -  ', 
+                    '| 湿度: -  ', 
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 18,
                     )
                   ),
                   Text(
-                    '| 环境温度: -', 
+                    '| 温度: -', 
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 18,
                     )
                   ),
                   Text(
-                    '| 环境光亮: -', 
+                    '| 光亮: -', 
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 18,
