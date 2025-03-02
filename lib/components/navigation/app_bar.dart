@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../controllers/config_controller.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final RxBool isCallButtonEnabled;
@@ -11,6 +12,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final configController = Get.find<ConfigController>();
+
     return Obx(() => AppBar(
       backgroundColor: isCallButtonEnabled.value 
           ? Theme.of(context).primaryColor 
@@ -19,6 +22,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Row(
         children: [
           const Text('HFS'),
+          const SizedBox(width: 8),
+          Obx(() => Text(
+            configController.lineName.value,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          )),
           Expanded(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

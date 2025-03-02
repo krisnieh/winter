@@ -1,71 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../components/base_components.dart';
-import '../../controllers/working_line/device_controller.dart';
+import '../../components/control/vertical_slider.dart';
+import '../../components/navigation/bottom_control_bar.dart';
+import '../../controllers/working_line/working_line_device_controller.dart';
+import '../../components/control/finder.dart';
 
 class WorkingLinePage extends StatelessWidget {
   const WorkingLinePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<DeviceController>();
+    final controller = Get.find<WorkingLineDeviceController>();
 
     return Scaffold(
       appBar: CustomAppBar(
-        isCallButtonEnabled: controller.isCallButtonEnabled,
+        isCallButtonEnabled: controller.isWLCallButtonEnabled,
       ),
-      body: Stack(
+      body: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              NumberKeypad(
-                inputValue: controller.inputValue,
-                onNumberPressed: controller.handleNumberPressed,
-                onDelete: controller.handleDelete,
-                onSearch: controller.handleSearch,
-              ),
-              SliderPanel(
-                sliderValue: controller.sliderValue,
-                isSettingButtonEnabled: controller.isSettingButtonEnabled,
-                onSetValue: controller.setSliderValue,
-              ),
-            ],
-          ),
-          Positioned(
-            left: 16,
-            bottom: 16,
-            child: Row(
+          // 左侧区域 (90%)
+          Expanded(
+            flex: 90,
+            child: Column(
               children: [
-                Obx(() => FloatingActionButton(
-                      heroTag: 'call',
-                      onPressed: controller.isCallButtonEnabled.value
-                          ? controller.triggerCall
-                          : null,
-                      backgroundColor: Colors.red[600],
-                      foregroundColor: Colors.white,
-                      child: const Icon(Icons.call),
-                    )),
-                const SizedBox(width: 16),
-                Obx(() => FloatingActionButton(
-                      heroTag: 'light',
-                      onPressed: controller.isLightButtonEnabled.value
-                          ? controller.toggleLight
-                          : null,
-                      backgroundColor: controller.isLightOn.value
-                          ? Colors.amber[700]
-                          : Colors.grey[300],
-                      foregroundColor: Colors.white,
-                      child: const Icon(Icons.lightbulb),
-                    )),
-                const SizedBox(width: 16),
-                FloatingActionButton(
-                  heroTag: 'fan',
-                  onPressed: null,
-                  backgroundColor: Colors.grey[300],
-                  foregroundColor: Colors.grey[600],
-                  child: const Icon(Icons.air),
+                // 上方Finder (90%)
+                Expanded(
+                  flex: 90,
+                  child: Finder(
+                    inputValue: controller.wlInputValue,
+                    onNumberPressed: controller.handleNumberPressed,
+                    onDelete: controller.handleDelete,
+                    onReturn: controller.handleSearch,
+                    searchResults: [],
+                  ),
+                ),
+                // 底部导航栏 (10%)
+                const Expanded(
+                  flex: 10,
+                  child: BottomControlBar(),
                 ),
               ],
+            ),
+          ),
+          // 右侧滑块区域 (10%)
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.1,
+            child: VerticalSlider(
+              sliderValue: controller.wlSliderValue,
+              isSettingButtonEnabled: controller.isWLSettingButtonEnabled,
+              onSetValue: controller.setSliderValue,
             ),
           ),
         ],

@@ -3,10 +3,11 @@ import 'package:get/get.dart';
 import 'views/working_line/working_line_page.dart';
 import 'services/mqtt_service.dart';
 import 'package:flutter_fullscreen/flutter_fullscreen.dart';
-import 'views/testing_line/testing_line_page.dart';
+// import 'views/testing_line/testing_line_page.dart';
 import 'dart:io';
 import 'controllers/config_controller.dart';
-import 'views/admin/admin_page.dart';
+// import 'views/admin/admin_page.dart';
+import 'controllers/working_line/working_line_device_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +17,7 @@ void main() async {
   // 初始化全局配置
   Get.put(ConfigController());
   Get.put(MqttService());
+  Get.put(WorkingLineDeviceController());
 
   // 获取主机名并决定初始路由
   final config = Get.find<ConfigController>();
@@ -60,8 +62,8 @@ class MyApp extends StatelessWidget {
       ),
       getPages: [
         GetPage(name: '/working/unit', page: () => const WorkingLinePage()),
-        GetPage(name: '/testing/unit', page: () => const TestingLinePage()),
-        GetPage(name: '/admin', page: () => const AdminPage()),
+        // GetPage(name: '/testing/unit', page: () => const TestingLinePage()),
+        // GetPage(name: '/admin', page: () => const AdminPage()),
       ],
       initialRoute: initialRoute,
     );

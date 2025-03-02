@@ -21,7 +21,7 @@ class ConfigController extends GetxController {
     try {
       hostname.value = Platform.localHostname;
       parts.value = hostname.value.split('-');
-      line.value = parts[1].toUpperCase();
+      line.value = parts.value[1].toUpperCase();
       lineName.value = getLineName();
     } catch (e) {
       print('初始化配置失败: $e');
@@ -32,9 +32,11 @@ class ConfigController extends GetxController {
   String getLineName() {
     switch (line.value) {
       case 'TL':
-        return 'testing_line';
+        return 'TL';
       case 'WL':
-        return 'working_line';
+        final list = parts.value[2].toUpperCase();
+        final unit = parts.value[3];
+        return '  WL - $list$unit';
       case 'AD':
         return '仓储';
       case 'QC':
