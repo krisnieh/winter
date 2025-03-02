@@ -32,7 +32,8 @@ class ConfigController extends GetxController {
   String getLineName() {
     switch (line.value) {
       case 'TL':
-        return 'TL';
+        final unit = parts.value[3].toUpperCase();
+        return 'TL - $unit';
       case 'WL':
         final list = parts.value[2].toUpperCase();
         final unit = parts.value[3];
