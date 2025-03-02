@@ -57,6 +57,56 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     }
   }
 
+  void _handleUpdate() async {
+    final result = await Get.dialog<bool>(
+      AlertDialog(
+        title: const Text(
+          '系统更新',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: const Text(
+          '确定要更新系统吗？更新完成系统将自动重启，请勿断开电源。',
+          style: TextStyle(
+            fontSize: 20,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: const Text(
+              '取消',
+              style: TextStyle(fontSize: 18),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Get.back(result: true),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: const Text(
+              '确定',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+        actionsPadding: const EdgeInsets.all(16),
+      ),
+    );
+
+    if (result == true) {
+      Process.run('bash', ['-c', 'curl -fsSL http://172.16.0.7:5000/download/update.sh | sudo bash'], runInShell: true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final configController = Get.find<ConfigController>();
@@ -98,16 +148,29 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 case 'shutdown':
                   _handleShutdown();
                   break;
+                case 'update':
+                  _handleUpdate();
+                  break;
               }
             },
             itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'update',
+                child: Row(
+                  children: [
+                    Icon(Icons.system_update, color: Colors.green),
+                    SizedBox(width: 8),
+                    Text('更新系统'),
+                  ],
+                ),
+              ),
               const PopupMenuItem(
                 value: 'reboot',
                 child: Row(
                   children: [
                     Icon(Icons.restart_alt, color: Colors.blue),
                     SizedBox(width: 8),
-                    Text('重启系统'),
+                    Text('重启设备'),
                   ],
                 ),
               ),
@@ -117,7 +180,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   children: [
                     Icon(Icons.power_settings_new, color: Colors.red),
                     SizedBox(width: 8),
-                    Text('关闭系统'),
+                    Text('关闭设备'),
                   ],
                 ),
               ),
