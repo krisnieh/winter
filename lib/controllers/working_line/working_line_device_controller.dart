@@ -21,6 +21,11 @@ class WorkingLineDeviceController extends BaseController {
   // 添加 disposed 变量
   final RxBool _disposed = false.obs;
 
+  // 添加环境数据状态
+  final RxDouble temperature = 0.0.obs;
+  final RxDouble humidity = 0.0.obs;
+  final RxInt lightLevel = 0.obs;
+
   @override
   void onInit() {
     super.onInit();

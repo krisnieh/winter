@@ -74,21 +74,21 @@ class BottomControlBar extends StatelessWidget {
                     )
                   ),
                   Text(
-                    '| 温度: -', 
+                    '| 温度: ${controller.temperature.value} °C  ', 
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 18,
                     )
                   ),
                   Text(
-                    '| 湿度: -  ', 
+                    '| 湿度: ${controller.humidity.value} %  ', 
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 18,
                     )
                   ),
                   Text(
-                    '| 光亮: -', 
+                    '| 光亮: ${controller.lightLevel.value} lx', 
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 18,
