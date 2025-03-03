@@ -38,15 +38,20 @@ class BaseController extends GetxController {
 
   // 构建MQTT主题
   String buildMqttTopic(String endpoint) {
-    final prefix = config.getMqttPrefix();
     switch (config.line.value) {
       case 'WL':
         final list = config.parts.value[2].toUpperCase();
         final unit = config.parts.value[3];
-        return '$prefix/$list/$unit$endpoint';
+        return 'hsf/working_line/$list/$unit$endpoint';
       case 'TL':
-        final unit = config.parts.value[3].toUpperCase();
-        return '$prefix/unit/$unit$endpoint';
+        final type = config.parts[2];
+        switch (type) {
+          case 'unit':
+            final unit = config.parts.value[3].toUpperCase();
+            return 'hsf/testing_line/unit/$unit$endpoint';
+          case 'prepare':
+            return 'hsf/testing_line/prepare$endpoint';
+        }
     }
     return '';
   }

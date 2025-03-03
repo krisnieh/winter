@@ -28,25 +28,53 @@ class TestingLineDeviceController extends BaseController {
 
   void setupPositionArrivedSubscription() {
     final topic = buildMqttTopic('/arrived');
-    MqttService.instance.subscribe(
-      topic,
+    print('[Controller] 订阅位置到达主题: $topic');
+    
+    MqttService.instance.subscribe(topic).listen(
       (payload) {
-        if (payload == tlRequestId.value) {
-          isTLSettingButtonEnabled.value = true;
-          tlRequestId.value = '';
+        print('[Controller] 收到MQTT消息: $payload');
+        
+        try {
+          final payloadStr = payload.trim();
+          final requestStr = tlRequestId.value.trim();
+          
+          print('[Controller] 比较ID: payload=$payloadStr, requestId=$requestStr');
+          
+          if (payloadStr == requestStr) {
+            print('[Controller] ID匹配，更新状态');
+            isTLSettingButtonEnabled.value = true;
+            tlRequestId.value = '';
+            
+            Get.snackbar(
+              '提示',
+              '位置设置完成',
+              snackPosition: SnackPosition.TOP,
+              duration: const Duration(seconds: 2),
+            );
+          }
+        } catch (e, stack) {
+          print('[Controller] 处理消息时出错: $e');
+          print('[Controller] 错误堆栈: $stack');
         }
+      },
+      onError: (error) {
+        print('[Controller] MQTT订阅错误: $error');
       },
     );
   }
 
   void setupCallArrivedSubscription() {
-    MqttService.instance.subscribe(
-      buildMqttTopic('/alert/deactived'),
+    final topic = buildMqttTopic('/alert/deactived');
+    
+    MqttService.instance.subscribe(topic).listen(
       (payload) {
         if (payload == tlCallRequestId.value) {
           isTLCallButtonEnabled.value = true;
           tlCallRequestId.value = '';
         }
+      },
+      onError: (error) {
+        print('[Controller] MQTT订阅错误: $error');
       },
     );
   }

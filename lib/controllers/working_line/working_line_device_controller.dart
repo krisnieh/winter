@@ -18,6 +18,9 @@ class WorkingLineDeviceController extends BaseController {
   // 添加一个变量来控制是否正在检测
   bool _isCheckingLock = false;
 
+  // 添加 disposed 变量
+  final RxBool _disposed = false.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -29,25 +32,45 @@ class WorkingLineDeviceController extends BaseController {
 
   void setupPositionArrivedSubscription() {
     final topic = buildMqttTopic('/arrived');
-    MqttService.instance.subscribe(
-      topic,
+    
+    final subscription = MqttService.instance.subscribe(topic).listen(
       (payload) {
-        if (payload == wlRequestId.value) {
-          isWLSettingButtonEnabled.value = true;
-          wlRequestId.value = '';
+        if (wlRequestId.value.isEmpty) {
+          return;
+        }
+        
+        try {
+          final payloadStr = payload;
+          final requestStr = wlRequestId.value;
+          
+          if (payloadStr == requestStr) {
+            wlRequestId.value = '';
+            isWLSettingButtonEnabled.value = true;
+          }
+        } catch (e) {
+          print('处理位置到达消息出错: $e');
         }
       },
+      onError: (error) {
+        print('MQTT订阅错误: $error');
+      },
     );
+
+    ever(_disposed, (_) => subscription.cancel());
   }
 
   void setupCallArrivedSubscription() {
-    MqttService.instance.subscribe(
-      buildMqttTopic('/alert/deactived'),
+    final topic = buildMqttTopic('/alert/deactived');
+    
+    MqttService.instance.subscribe(topic).listen(
       (payload) {
         if (payload == wlCallRequestId.value) {
           isWLCallButtonEnabled.value = true;
           wlCallRequestId.value = '';
         }
+      },
+      onError: (error) {
+        print('[Controller] MQTT订阅错误: $error');
       },
     );
   }
@@ -201,7 +224,23 @@ class WorkingLineDeviceController extends BaseController {
 
   Future<void> setPosition(String value) async {
     final currentRequestId = DateTime.now().millisecondsSinceEpoch.toString();
+    
     wlRequestId.value = currentRequestId;
+    isWLSettingButtonEnabled.value = false;
+    
+    Future.delayed(const Duration(seconds: 30), () {
+      if (wlRequestId.value == currentRequestId) {
+        wlRequestId.value = '';
+        isWLSettingButtonEnabled.value = true;
+        
+        Get.snackbar(
+          '提示',
+          '位置设置超时',
+          snackPosition: SnackPosition.TOP,
+          duration: const Duration(seconds: 2),
+        );
+      }
+    });
     
     try {
       final url = buildUrl('/set_position/$value/$currentRequestId');
@@ -215,7 +254,13 @@ class WorkingLineDeviceController extends BaseController {
     } catch (e) {
       wlRequestId.value = '';
       isWLSettingButtonEnabled.value = true;
-      throw e;  // 向上传递错误
+      throw e;
     }
+  }
+
+  @override
+  void onClose() {
+    _disposed.value = true;
+    super.onClose();
   }
 }

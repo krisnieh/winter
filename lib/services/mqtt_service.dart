@@ -1,14 +1,23 @@
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:get/get.dart';
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+
+// 将 MqttMessage 移到类外部
+class MqttTopicMessage {
+  final String topic;
+  final String payload;
+  MqttTopicMessage(this.topic, this.payload);
+}
 
 class MqttService extends GetxService {
   static MqttService get instance => Get.find();
   late MqttServerClient _client;
   final RxBool isConnected = false.obs;
-  final Map<String, Function(String)> _subscriptions = {}; // 存储订阅回调
-
+  
+  // 存储待处理的订阅
+  final Map<String, List<StreamController<String>>> _pendingSubscriptions = {};
+  
   @override
   void onInit() {
     super.onInit();
@@ -26,59 +35,81 @@ class MqttService extends GetxService {
     _client.websocketProtocols = ['mqtt'];
     _client.secure = false;
     _client.port = 8083;
-    _client.connectionMessage = MqttConnectMessage()
-        .withClientIdentifier(
-            'flutter_client_${DateTime.now().millisecondsSinceEpoch}')
-        .startClean();
     _client.keepAlivePeriod = 20;
-    _client.logging(on: false); // 关闭日志
+    _client.logging(on: false);
+
+    _client.onConnected = () {
+      isConnected.value = true;
+      _setupMessageHandler();
+      _resubscribeAll();
+    };
+    
+    _client.onDisconnected = () {
+      isConnected.value = false;
+      Future.delayed(const Duration(seconds: 5), _initMqtt);
+    };
 
     try {
       await _client.connect();
-      isConnected.value = true;
-      // 连接成功后重新订阅
-      _resubscribe();
     } catch (e) {
-      // 尝试重新连接
       Future.delayed(const Duration(seconds: 5), _initMqtt);
     }
   }
 
-  void subscribe(String topic, Function(String) onMessage) {
-    _subscriptions[topic] = onMessage; // 保存订阅信息
-
-    if (isConnected.value) {
-      _doSubscribe(topic, onMessage);
-    }
-  }
-
-  void _doSubscribe(String topic, Function(String) onMessage) {
-    _client.subscribe(topic, MqttQos.atLeastOnce);
-
+  void _setupMessageHandler() {
     _client.updates?.listen((List<MqttReceivedMessage<MqttMessage>> c) {
-      final recTopic = c[0].topic;
-      final message = c[0].payload as MqttPublishMessage;
-      final payload =
-          MqttPublishPayload.bytesToStringAsString(message.payload.message);
-
-      if (recTopic == topic) {
-        onMessage(payload);
+      final recMess = c[0].payload as MqttPublishMessage;
+      final topic = c[0].topic;
+      final payload = MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+      
+      if (_pendingSubscriptions.containsKey(topic)) {
+        for (var controller in _pendingSubscriptions[topic]!) {
+          if (!controller.isClosed) {
+            controller.add(payload);
+          }
+        }
       }
     });
   }
 
-  void _resubscribe() {
-    for (var entry in _subscriptions.entries) {
-      _doSubscribe(entry.key, entry.value);
+  void _resubscribeAll() {
+    for (var topic in _pendingSubscriptions.keys) {
+      _client.subscribe(topic, MqttQos.atLeastOnce);
     }
+  }
+
+  Stream<String> subscribe(String topic) {
+    final controller = StreamController<String>.broadcast();
+    _pendingSubscriptions.putIfAbsent(topic, () => []).add(controller);
+    
+    if (isConnected.value) {
+      _client.subscribe(topic, MqttQos.atLeastOnce);
+    }
+    
+    controller.onCancel = () {
+      _pendingSubscriptions[topic]?.remove(controller);
+      if (_pendingSubscriptions[topic]?.isEmpty ?? false) {
+        _pendingSubscriptions.remove(topic);
+        if (isConnected.value) {
+          _client.unsubscribe(topic);
+        }
+      }
+    };
+    
+    return controller.stream;
   }
 
   @override
   void onClose() {
-    if (isConnected.value) {
+    for (var controllers in _pendingSubscriptions.values) {
+      for (var controller in controllers) {
+        controller.close();
+      }
+    }
+    _pendingSubscriptions.clear();
+    if (_client.connectionStatus?.state == MqttConnectionState.connected) {
       _client.disconnect();
     }
-    _subscriptions.clear();
     super.onClose();
   }
 }
