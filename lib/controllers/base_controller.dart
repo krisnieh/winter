@@ -18,7 +18,6 @@ class BaseController extends GetxController {
 
   // 构建完整的API URL
   String buildUrl(String endpoint) {
-    final prefix = config.getApiPrefix();
     switch (config.line.value) {
       case 'WL':
         final list = config.parts.value[2].toUpperCase();

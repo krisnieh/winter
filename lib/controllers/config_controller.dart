@@ -53,44 +53,4 @@ class ConfigController extends GetxController {
         return 'working_line';
     }
   }
-
-  // 获取MQTT主题前缀
-  String getMqttPrefix() {
-    switch (line.value) {
-      case 'TL':
-        return 'hsf/testing_line';
-      case 'WL':
-        return 'hsf/working_line';
-      case 'QC':
-        return 'hsf/qc';
-      case 'TASK':
-        return 'hsf/task';
-      case 'DASHBOARD':
-        return 'hsf/dashboard';
-      case 'ADMIN':
-        return 'hsf/admin';
-      default:
-        return 'hsf';
-    }
-  }
-
-  // 获取API前缀
-  String getApiPrefix() {
-    switch (line.value) {
-      case 'TL':
-        return 'testing_line';
-      case 'WL':
-        return 'working_line';
-      case 'QC':
-        return 'qc';
-      case 'TASK':
-        return 'task';
-      case 'DASHBOARD':
-        return 'dashboard';
-      case 'ADMIN':
-        return 'admin';
-      default:
-        return '';
-    }
-  }
 } 
