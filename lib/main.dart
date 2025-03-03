@@ -9,6 +9,7 @@ import 'controllers/config_controller.dart';
 // import 'views/admin/admin_page.dart';
 import 'controllers/working_line/working_line_device_controller.dart';
 import 'controllers/testing_line/testing_line_device_controller.dart';
+import 'controllers/mqtt_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +21,7 @@ void main() async {
   Get.put(MqttService());
   Get.put(WorkingLineDeviceController());
   Get.put(TestingLineDeviceController());
+  Get.put(MqttController());
 
   // 获取主机名并决定初始路由
   final config = Get.find<ConfigController>();

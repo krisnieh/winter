@@ -26,53 +26,6 @@ class WorkingLineDeviceController extends BaseController {
     super.onInit();
     initLightStatus();
     initPosition();
-    setupPositionArrivedSubscription();
-    setupCallArrivedSubscription();
-  }
-
-  void setupPositionArrivedSubscription() {
-    final topic = buildMqttTopic('/arrived');
-    
-    final subscription = MqttService.instance.subscribe(topic).listen(
-      (payload) {
-        if (wlRequestId.value.isEmpty) {
-          return;
-        }
-        
-        try {
-          final payloadStr = payload;
-          final requestStr = wlRequestId.value;
-          
-          if (payloadStr == requestStr) {
-            wlRequestId.value = '';
-            isWLSettingButtonEnabled.value = true;
-          }
-        } catch (e) {
-          print('处理位置到达消息出错: $e');
-        }
-      },
-      onError: (error) {
-        print('MQTT订阅错误: $error');
-      },
-    );
-
-    ever(_disposed, (_) => subscription.cancel());
-  }
-
-  void setupCallArrivedSubscription() {
-    final topic = buildMqttTopic('/alert/deactived');
-    
-    MqttService.instance.subscribe(topic).listen(
-      (payload) {
-        if (payload == wlCallRequestId.value) {
-          isWLCallButtonEnabled.value = true;
-          wlCallRequestId.value = '';
-        }
-      },
-      onError: (error) {
-        print('[Controller] MQTT订阅错误: $error');
-      },
-    );
   }
 
   Future<void> initLightStatus() async {
