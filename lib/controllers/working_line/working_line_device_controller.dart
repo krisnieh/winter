@@ -85,23 +85,15 @@ class WorkingLineDeviceController extends BaseController {
     isWLLightButtonEnabled.value = false;
     try {
       final response = await dio.get(buildUrl('/lights/toggle'));
-
-      if (response.data is Map && response.data.containsKey('status')) {
-        final bool status = response.data['status'] == true;
-        isWLLightOn.value = status;
-      } else {
-        if (kDebugMode) {
-          print('无效的灯光状态响应: ${response.data}');
-        }
-      }
+      isWLLightOn.value = response.data['status'] ?? false;
     } catch (e) {
-      if (kDebugMode) {
-        print('切换灯光失败: $e');
-      }
+      Get.snackbar('Error', '切换灯光失败: ${e.toString()}');
+      print('切换灯光失败: ${e.toString()}');
     } finally {
       isWLLightButtonEnabled.value = true;
     }
   }
+
 
   Future<void> triggerCall() async {
     // 首先显示确认对话框
