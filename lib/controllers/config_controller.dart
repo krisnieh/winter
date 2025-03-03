@@ -4,6 +4,7 @@ import 'dart:io';
 class ConfigController extends GetxController {
   static ConfigController get instance => Get.find();
 
+  final RxString serverUrl = 'http://172.16.0.8:5006'.obs;
   final RxString hostname = ''.obs;
   final RxString line = ''.obs;      // WL 或 TL
   final RxString unit = ''.obs;      // 单元编号

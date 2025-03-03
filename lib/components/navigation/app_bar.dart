@@ -2,14 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:io';
 import '../../controllers/config_controller.dart';
+import 'dart:async';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final RxBool isCallButtonEnabled;
+  final RxString currentTime = ''.obs;
   
-  const CustomAppBar({
+  CustomAppBar({
     super.key,
     required this.isCallButtonEnabled,
-  });
+  }) {
+    _updateTime();
+    Timer.periodic(const Duration(seconds: 1), (timer) => _updateTime());
+  }
 
   void _handleReboot() async {
     final result = await Get.dialog<bool>(
@@ -58,6 +63,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   void _handleUpdate() async {
+    final configController = Get.find<ConfigController>();
+    
     final result = await Get.dialog<bool>(
       AlertDialog(
         title: const Text(
@@ -103,8 +110,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
 
     if (result == true) {
-      Process.run('bash', ['-c', 'curl -fsSL http://172.16.0.7:5000/download/update.sh | sudo bash'], runInShell: true);
+      Process.run('bash', ['-c', 'curl -fsSL ${configController.serverUrl.value}/download/update.sh | sudo bash'], runInShell: true);
     }
+  }
+
+  void _updateTime() {
+    final now = DateTime.now();
+    currentTime.value = '${now.year}年${now.month.toString().padLeft(2, '0')}月${now.day.toString().padLeft(2, '0')}日 '
+        '${now.hour.toString().padLeft(2, '0')}:'
+        '${now.minute.toString().padLeft(2, '0')}:'
+        '${now.second.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -138,8 +153,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               ],
             ),
           ),
+          Obx(() => Text(
+            currentTime.value,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          )),
+          const SizedBox(width: 16),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.settings),
+            icon: const Icon(Icons.arrow_drop_down),
             onSelected: (value) {
               switch (value) {
                 case 'reboot':

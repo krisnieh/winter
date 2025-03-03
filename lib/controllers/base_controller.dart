@@ -4,8 +4,6 @@ import 'dart:io';
 import '../controllers/config_controller.dart';
 
 class BaseController extends GetxController {
-  static const url = 'http://172.16.0.8:5006/api';
-
   final Dio _dio = Dio();
   final config = Get.find<ConfigController>();
 
@@ -22,14 +20,14 @@ class BaseController extends GetxController {
       case 'WL':
         final list = config.parts.value[2].toUpperCase();
         final unit = config.parts.value[3];
-        return '$url/working_line/$list/$unit$endpoint';
+        return '${config.serverUrl.value}/api/working_line/$list/$unit$endpoint';
       case 'TL':
         switch (config.type.value) {
           case 'unit':
             final unit = config.parts.value[3].toUpperCase();
-            return '$url/testing_line/unit/$unit$endpoint';
+            return '${config.serverUrl.value}/api/testing_line/unit/$unit$endpoint';
           case 'prepare':
-            return '$url/testing_line/prepare$endpoint';
+            return '${config.serverUrl.value}/api/testing_line/prepare$endpoint';
         }
     }
     return '';
