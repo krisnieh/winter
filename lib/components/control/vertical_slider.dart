@@ -71,13 +71,19 @@ class VerticalSlider extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
+                  padding: const EdgeInsets.symmetric(horizontal: 4), // 减小水平内边距
+                  minimumSize: const Size.fromHeight(48), // 设置固定高度
+                  elevation: 4, // 添加阴影
+                  shadowColor: Colors.black.withOpacity(0.3), // 设置阴影颜色和透明度
                 ),
                 child: Text(
                   sliderValue.value.toStringAsFixed(0),
                   style: const TextStyle(
-                    fontSize: 24,  // 放大按钮字号
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
+                  maxLines: 1, // 强制单行显示
+                  overflow: TextOverflow.visible, // 允许文本溢出
                 ),
               )),
             ),
