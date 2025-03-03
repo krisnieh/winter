@@ -181,7 +181,7 @@ class WorkingLineDeviceController extends BaseController {
     wlRequestId.value = currentRequestId;
     isWLSettingButtonEnabled.value = false;
     
-    Future.delayed(const Duration(seconds: 30), () {
+    Future.delayed(const Duration(seconds: 10), () {
       if (wlRequestId.value == currentRequestId) {
         wlRequestId.value = '';
         isWLSettingButtonEnabled.value = true;
