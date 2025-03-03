@@ -118,7 +118,7 @@ class JudgeContent extends StatelessWidget {
             label,
             style: const TextStyle(
               fontSize: 20,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w500,
             ),
           ),
           const Spacer(),
@@ -126,7 +126,7 @@ class JudgeContent extends StatelessWidget {
             value,
             style: TextStyle(
               fontSize: 20,              
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],

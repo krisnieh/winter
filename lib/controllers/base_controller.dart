@@ -4,7 +4,7 @@ import 'dart:io';
 import '../controllers/config_controller.dart';
 
 class BaseController extends GetxController {
-  static const url = 'http://172.16.0.7:5000/api';
+  static const url = 'http://172.16.0.8:5006/api';
 
   final Dio _dio = Dio();
   final config = Get.find<ConfigController>();
