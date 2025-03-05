@@ -20,14 +20,15 @@ class BaseController extends GetxController {
       case 'WL':
         final list = config.parts.value[2].toUpperCase();
         final unit = config.parts.value[3];
-        return '${config.serverUrl.value}/api/working_line/$list/$unit$endpoint';
+        return '${ConfigController.serverUrl}/api/working_line/$list/$unit$endpoint';
       case 'TL':
-        switch (config.type.value) {
+        final type = config.parts.value[2];
+        switch (type) {
           case 'unit':
             final unit = config.parts.value[3].toUpperCase();
-            return '${config.serverUrl.value}/api/testing_line/unit/$unit$endpoint';
+            return '${ConfigController.serverUrl}/api/testing_line/unit/$unit$endpoint';
           case 'prepare':
-            return '${config.serverUrl.value}/api/testing_line/prepare$endpoint';
+            return '${ConfigController.serverUrl}/api/testing_line/prepare$endpoint';
         }
     }
     return '';

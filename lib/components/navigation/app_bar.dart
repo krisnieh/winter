@@ -110,7 +110,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
 
     if (result == true) {
-      Process.run('bash', ['-c', 'curl -fsSL ${configController.serverUrl.value}/download/update.sh | sudo bash'], runInShell: true);
+      Process.run('bash', ['-c', 'curl -fsSL ${ConfigController.serverUrl}/download/update.sh | sudo bash'], runInShell: true);
     }
   }
 
@@ -177,16 +177,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               }
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'update',
-                child: Row(
-                  children: [
-                    Icon(Icons.system_update, color: Colors.green),
-                    SizedBox(width: 8),
-                    Text('更新系统'),
-                  ],
-                ),
-              ),
               const PopupMenuItem(
                 value: 'reboot',
                 child: Row(

@@ -3,8 +3,10 @@ import 'dart:io';
 
 class ConfigController extends GetxController {
   static ConfigController get instance => Get.find();
-
-  final RxString serverUrl = 'http://172.16.0.8:5006'.obs;
+  
+  // 添加服务器URL配置
+  static const String serverUrl = 'http://172.16.0.8:5006';
+  
   final RxString hostname = ''.obs;
   final RxString line = ''.obs;      // WL 或 TL
   final RxString unit = ''.obs;      // 单元编号
@@ -12,20 +14,46 @@ class ConfigController extends GetxController {
   final RxList<String> parts = <String>[].obs;
   final RxString lineName = ''.obs;
 
+  // 添加初始化状态标志
+  final RxBool _isInitialized = false.obs;
+
+  // 获取初始化状态
+  bool get isInitialized => _isInitialized.value;
+
   @override
-  void onInit() {
+  Future<void> onInit() async {
     super.onInit();
-    initConfig();
+    await initConfig();
   }
 
-  void initConfig() {
+  Future<void> initConfig() async {
     try {
       hostname.value = Platform.localHostname;
+      if (hostname.value.isEmpty) {
+        throw Exception('获取主机名失败');
+      }
+
       parts.value = hostname.value.split('-');
+      if (parts.isEmpty) {
+        throw Exception('主机名格式错误: ${hostname.value}');
+      }
+
       line.value = parts.value[1].toUpperCase();
+      if (line.value.isEmpty) {
+        throw Exception('获取生产线类型失败');
+      }
+
       lineName.value = getLineName();
+      if (lineName.value.isEmpty) {
+        throw Exception('获取生产线名称失败');
+      }
+
+      _isInitialized.value = true;
+      print('配置初始化成功: ${hostname.value}');
     } catch (e) {
-      print('初始化配置失败: $e');
+      print('配置初始化失败: $e');
+      _isInitialized.value = false;
+      rethrow; // 重新抛出异常，让上层知道初始化失败
     }
   }
 

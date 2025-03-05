@@ -81,7 +81,9 @@ class TestingLineDeviceController extends BaseController {
 
   Future<void> initLightStatus() async {
     try {
-      final response = await dio.get(buildUrl('/lights/status'));
+      final url = buildUrl('/lights/status');
+      print('获取灯光状态请求: $url');
+      final response = await dio.get(url);
       isTLLightOn.value = response.data['status'] ?? false;
     } catch (e) {
       Get.snackbar('Error', '获取灯光状态失败: ${e.toString()}');
@@ -91,7 +93,9 @@ class TestingLineDeviceController extends BaseController {
 
   Future<void> initPosition() async {
     try {
-      final response = await dio.get(buildUrl('/position'));
+      final url = buildUrl('/position');
+      print('获取初始位置请求: $url');
+      final response = await dio.get(url);
       if (response.data is Map<String, dynamic>) {
         final position = response.data['position'];
         if (position != null) {
@@ -228,7 +232,8 @@ class TestingLineDeviceController extends BaseController {
     tlRequestId.value = currentRequestId;
     
     try {
-      final url = buildUrl('/position/set/$value/$currentRequestId');
+      final url = buildUrl('/set_position/$value/$currentRequestId');
+      print('设置位置请求: $url');
       await dio.get(
         url,
         options: Options(

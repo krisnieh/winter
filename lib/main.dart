@@ -16,18 +16,39 @@ void main() async {
   await FullScreen.ensureInitialized();
   FullScreen.setFullScreen(true);
   
-  // 初始化全局配置
-  Get.put(ConfigController());
-  Get.put(MqttService());
-  Get.put(WorkingLineDeviceController());
-  Get.put(TestingLineDeviceController());
-  Get.put(MqttController());
-
-  // 获取主机名并决定初始路由
-  final config = Get.find<ConfigController>();
-  final String initialRoute = getInitialRoute(config);
+  // 初始化配置控制器
+  final configController = Get.put(ConfigController());
   
-  runApp(MyApp(initialRoute: initialRoute));
+  try {
+    // 等待配置初始化完成
+    await configController.initConfig();
+    
+    // 初始化其他服务
+    Get.put(MqttService());
+    Get.put(WorkingLineDeviceController());
+    Get.put(TestingLineDeviceController());
+    Get.put(MqttController());
+
+    // 获取主机名并决定初始路由
+    final config = Get.find<ConfigController>();
+    final String initialRoute = getInitialRoute(config);
+    
+    // 启动应用
+    runApp(MyApp(initialRoute: initialRoute));
+  } catch (e) {
+    // 显示错误界面
+    runApp(MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Text(
+            '配置初始化失败: $e\n请检查设备配置后重启应用',
+            style: const TextStyle(fontSize: 24),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    ));
+  }
 }
 
 String getInitialRoute(ConfigController config) {

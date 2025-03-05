@@ -88,7 +88,7 @@ class BottomControlBar extends StatelessWidget {
                     )
                   ),
                   Text(
-                    '| 光亮: ${controller.lightLevel.value} lx', 
+                    '| 光亮度: ${controller.lightLevel.value} Lux', 
                     style: TextStyle(
                       color: Colors.grey[600],
                       fontSize: 18,
