@@ -51,6 +51,7 @@ class WorkingLinePage extends StatelessWidget {
               sliderValue: controller.wlSliderValue,
               isSettingButtonEnabled: controller.isWLSettingButtonEnabled,
               onSetValue: controller.setSliderValue,
+              onSetPosition: controller.setPosition,
             ),
           ),
         ],

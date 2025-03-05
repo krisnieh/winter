@@ -6,19 +6,27 @@ class VerticalSlider extends StatelessWidget {
   final RxDouble sliderValue;
   final RxBool isSettingButtonEnabled;
   final Function(double) onSetValue;
+  final Future<void> Function(String) onSetPosition;
+  final bool invertDirection;  // 新增：控制方向
+  final double minValue;      // 新增：最小值
+  final double maxValue;      // 新增：最大值
 
   const VerticalSlider({
     super.key,
     required this.sliderValue,
     required this.isSettingButtonEnabled,
     required this.onSetValue,
+    required this.onSetPosition,
+    this.invertDirection = false,  // 默认不反转（上小下大）
+    this.minValue = 0,            // 默认最小值
+    this.maxValue = 100,          // 默认最大值
   });
 
   void _handleButtonPress() async {
     isSettingButtonEnabled.value = false;  // 禁用按钮
     try {
       final value = sliderValue.value.toStringAsFixed(0);
-      await Get.find<WorkingLineDeviceController>().setPosition(value);
+      await onSetPosition(value);
     } catch (e) {
       Get.snackbar(
         '错误',
@@ -45,12 +53,16 @@ class VerticalSlider extends StatelessWidget {
                 RotatedBox(
                   quarterTurns: 3,
                   child: Obx(() => Slider(
-                    value: sliderValue.value,
-                    onChanged: onSetValue,
-                    min: 0,
-                    max: 100,
-                    divisions: 100,
-                    label: sliderValue.value.toStringAsFixed(0), // 随动显示当前值
+                    value: invertDirection 
+                      ? maxValue - sliderValue.value  // 反转值
+                      : sliderValue.value,
+                    onChanged: (value) => onSetValue(
+                      invertDirection ? maxValue - value : value
+                    ),
+                    min: minValue,
+                    max: maxValue,
+                    divisions: (maxValue - minValue).toInt(),
+                    label: sliderValue.value.toStringAsFixed(0),
                   )),
                 ),
               ],

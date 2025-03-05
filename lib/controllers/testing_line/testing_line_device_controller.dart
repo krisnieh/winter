@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import '../../services/mqtt_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 class TestingLineDeviceController extends BaseController {
   final RxDouble tlSliderValue = 0.0.obs;
@@ -16,52 +17,65 @@ class TestingLineDeviceController extends BaseController {
   final RxString tlInputValue = ''.obs;
 
   bool _isCheckingLock = false;
+  bool _isInitialized = false;  // 添加初始化标志
+  bool _isAutoRecoveryScheduled = false;
 
   @override
   void onInit() {
     super.onInit();
-    initLightStatus();
-    initPosition();
-    setupPositionArrivedSubscription();
-    setupCallArrivedSubscription();
+    if (!_isInitialized) {
+      _isInitialized = true;
+      _initialize();
+    }
   }
 
-  void setupPositionArrivedSubscription() {
-    final topic = buildMqttTopic('/arrived');
-    print('[Controller] 订阅位置到达主题: $topic');
-    
-    MqttService.instance.subscribe(topic).listen(
-      (payload) {
-        print('[Controller] 收到MQTT消息: $payload');
-        
-        try {
-          final payloadStr = payload.trim();
-          final requestStr = tlRequestId.value.trim();
-          
-          print('[Controller] 比较ID: payload=$payloadStr, requestId=$requestStr');
-          
-          if (payloadStr == requestStr) {
-            print('[Controller] ID匹配，更新状态');
-            isTLSettingButtonEnabled.value = true;
-            tlRequestId.value = '';
-            
-            Get.snackbar(
-              '提示',
-              '位置设置完成',
-              snackPosition: SnackPosition.TOP,
-              duration: const Duration(seconds: 2),
-            );
-          }
-        } catch (e, stack) {
-          print('[Controller] 处理消息时出错: $e');
-          print('[Controller] 错误堆栈: $stack');
-        }
-      },
-      onError: (error) {
-        print('[Controller] MQTT订阅错误: $error');
-      },
-    );
+  Future<void> _initialize() async {
+    print('开始初始化控制器...');
+    try {
+      // 按顺序执行初始化
+      await initLightStatus();
+      await initPosition();
+      // setupPositionArrivedSubscription();
+      setupCallArrivedSubscription();
+      print('控制器初始化完成');
+    } catch (e) {
+      print('控制器初始化失败: $e');
+    }
   }
+
+  // void setupPositionArrivedSubscription() {
+  //   final topic = buildMqttTopic('/arrived');
+  //   print('[MQTT] 订阅位置到达主题: $topic');
+    
+  //   MqttService.instance.subscribe(topic).listen(
+  //     (payload) {
+  //       print('[MQTT] 收到位置到达消息: $payload');
+  //       print('[MQTT] 当前请求ID: ${tlRequestId.value}');
+        
+  //       try {
+  //         if (payload == tlRequestId.value) {
+  //           print('[MQTT] ID匹配');
+  //           tlRequestId.value = '';  // 只清除请求ID
+            
+  //           Get.snackbar(
+  //             '提示',
+  //             '位置设置完成',
+  //             snackPosition: SnackPosition.TOP,
+  //             duration: const Duration(seconds: 2),
+  //           );
+  //         } else {
+  //           print('[MQTT] ID不匹配，忽略消息');
+  //         }
+  //       } catch (e, stack) {
+  //         print('[MQTT] 处理消息时出错: $e');
+  //         print('[MQTT] 错误堆栈: $stack');
+  //       }
+  //     },
+  //     onError: (error) {
+  //       print('[MQTT] 订阅错误: $error');
+  //     },
+  //   );
+  // }
 
   void setupCallArrivedSubscription() {
     final topic = buildMqttTopic('/alert/deactived');
@@ -82,24 +96,33 @@ class TestingLineDeviceController extends BaseController {
   Future<void> initLightStatus() async {
     try {
       final url = buildUrl('/lights/status');
-      final response = await dio.get(url);
+      print('获取灯光状态: $url');
+      
+      final response = await dio.get(
+        url,
+        options: Options(
+          headers: {'Request-Id': DateTime.now().millisecondsSinceEpoch.toString()},  // 添加请求ID
+        ),
+      );
+      
+      print('灯光状态响应: ${response.data}');
       isTLLightOn.value = response.data['status'] ?? false;
+      
     } catch (e) {
+      print('获取灯光状态失败: $e');
       Get.snackbar('Error', '获取灯光状态失败: ${e.toString()}');
-      print('获取灯光状态失败: ${e.toString()}');
     }
   }
 
   Future<void> initPosition() async {
     try {
       final url = buildUrl('/position');
-      print('获取初始位置请求: $url');
+      print('获取初始位置: $url');
       
       final response = await dio.get(
         url,
         options: Options(
-          receiveTimeout: const Duration(seconds: 30),
-          sendTimeout: const Duration(seconds: 30),
+          headers: {'Request-Id': DateTime.now().millisecondsSinceEpoch.toString()},
         ),
       );
       
@@ -108,27 +131,30 @@ class TestingLineDeviceController extends BaseController {
       if (response.data is Map<String, dynamic>) {
         final position = response.data['position'];
         if (position != null) {
-          tlSliderValue.value = double.parse(position.toString());
-          print('设置初始位置: ${tlSliderValue.value}');
-        } else {
-          print('响应中没有position字段: ${response.data}');
+          // 确保值在有效范围内
+          double value = double.parse(position.toString());
+          value = value.clamp(2.0, 100.0);  // 限制在2-100范围内
+          tlSliderValue.value = value;
+          print('设置初始位置成功: ${tlSliderValue.value}');
         }
-      } else {
-        print('响应格式错误: ${response.data}');
       }
-    } catch (e, stack) {
+    } catch (e) {
       print('获取初始位置失败: $e');
-      print('错误堆栈: $stack');
-      Get.snackbar(
-        '错误',
-        '获取初始位置失败，将使用默认值',
-        snackPosition: SnackPosition.TOP,
-        duration: const Duration(seconds: 3),
-      );
+      _handleInitPositionError(e);
     }
   }
 
+  void _handleInitPositionError(dynamic error) {
+    Get.snackbar(
+      '提示',
+      '获取初始位置失败，将使用默认值',
+      snackPosition: SnackPosition.TOP,
+      duration: const Duration(seconds: 3),
+    );
+  }
+
   void setSliderValue(double value) {
+    value = value.clamp(2.0, 100.0);  // 限制在2-100范围内
     tlSliderValue.value = value;
   }
 
@@ -141,14 +167,10 @@ class TestingLineDeviceController extends BaseController {
         final bool status = response.data['status'] == true;
         isTLLightOn.value = status;
       } else {
-        if (kDebugMode) {
-          print('无效的灯光状态响应: ${response.data}');
-        }
+        print('无效的灯光状态响应: ${response.data}');
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('切换灯光失败: $e');
-      }
+      print('切换灯光失败: $e');
     } finally {
       isTLLightButtonEnabled.value = true;
     }
@@ -208,9 +230,7 @@ class TestingLineDeviceController extends BaseController {
         if (!isTLCallButtonEnabled.value && tlCallRequestId.value == currentRequestId) {
           isTLCallButtonEnabled.value = true;
           tlCallRequestId.value = '';
-          if (kDebugMode) {
-            print('呼叫操作超时: $currentRequestId');
-          }
+          print('呼叫操作超时: $currentRequestId');
         }
       });
 
@@ -248,23 +268,43 @@ class TestingLineDeviceController extends BaseController {
   }
 
   Future<void> setPosition(String value) async {
-    final currentRequestId = DateTime.now().millisecondsSinceEpoch.toString();
-    tlRequestId.value = currentRequestId;
+    debugPrint('===== setPosition 开始 =====');  // 使用 debugPrint 替代 print
     
     try {
+      // 1. 禁用按钮
+      debugPrint('1. 禁用按钮');
+      isTLSettingButtonEnabled.value = false;
+      
+      // 2. 发送请求
+      final currentRequestId = DateTime.now().millisecondsSinceEpoch.toString();
       final url = buildUrl('/set_position/$value/$currentRequestId');
-      print('设置位置请求: $url');
-      await dio.get(
-        url,
-        options: Options(
-          sendTimeout: const Duration(seconds: 30),
-          receiveTimeout: const Duration(seconds: 30),
-        ),
-      );
-    } catch (e) {
-      tlRequestId.value = '';
+      debugPrint('2. 发送请求: $url');
+      
+      // 使用 Future.microtask 确保在主线程上执行
+      Future.microtask(() async {
+        try {
+          await dio.get(url);
+          debugPrint('3. 请求发送成功');
+        } catch (e) {
+          debugPrint('请求发送失败: $e');
+        }
+      });
+      
+      // 3. 等待1秒
+      debugPrint('4. 开始等待1秒');
+      await Future.delayed(const Duration(seconds: 1));
+      
+      // 4. 恢复按钮状态
+      debugPrint('5. 恢复按钮状态');
+      Get.back(); // 如果有对话框，关闭它
       isTLSettingButtonEnabled.value = true;
-      throw e;
+      
+      debugPrint('===== setPosition 完成 =====');
+      
+    } catch (e) {
+      debugPrint('setPosition 发生错误: $e');
+      // 确保按钮状态恢复
+      isTLSettingButtonEnabled.value = true;
     }
   }
 } 
