@@ -4,7 +4,7 @@ import 'dart:io';
 import '../controllers/config_controller.dart';
 
 class BaseController extends GetxController {
-  final Dio _dio = Dio();
+  late final Dio _dio;
   final config = Get.find<ConfigController>();
 
   Dio get dio => _dio;
@@ -12,6 +12,35 @@ class BaseController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _initDio();
+  }
+
+  void _initDio() {
+    _dio = Dio(BaseOptions(
+      baseUrl: ConfigController.serverUrl,
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 30),
+      sendTimeout: const Duration(seconds: 30),
+      validateStatus: (status) {
+        return status != null && status > 0; // 接受所有非空的状态码
+      },
+    ));
+
+    // 添加响应拦截器以打印详细信息
+    _dio.interceptors.add(InterceptorsWrapper(
+      onResponse: (response, handler) {
+        print('API响应: ${response.requestOptions.uri}');
+        print('状态码: ${response.statusCode}');
+        print('响应数据: ${response.data}');
+        return handler.next(response);
+      },
+      onError: (error, handler) {
+        print('API错误: ${error.requestOptions.uri}');
+        print('错误信息: ${error.message}');
+        print('响应数据: ${error.response?.data}');
+        return handler.next(error);
+      },
+    ));
   }
 
   // 构建完整的API URL

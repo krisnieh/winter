@@ -82,7 +82,6 @@ class TestingLineDeviceController extends BaseController {
   Future<void> initLightStatus() async {
     try {
       final url = buildUrl('/lights/status');
-      print('获取灯光状态请求: $url');
       final response = await dio.get(url);
       isTLLightOn.value = response.data['status'] ?? false;
     } catch (e) {
@@ -95,16 +94,37 @@ class TestingLineDeviceController extends BaseController {
     try {
       final url = buildUrl('/position');
       print('获取初始位置请求: $url');
-      final response = await dio.get(url);
+      
+      final response = await dio.get(
+        url,
+        options: Options(
+          receiveTimeout: const Duration(seconds: 30),
+          sendTimeout: const Duration(seconds: 30),
+        ),
+      );
+      
+      print('初始位置响应: ${response.data}');
+      
       if (response.data is Map<String, dynamic>) {
         final position = response.data['position'];
         if (position != null) {
           tlSliderValue.value = double.parse(position.toString());
+          print('设置初始位置: ${tlSliderValue.value}');
+        } else {
+          print('响应中没有position字段: ${response.data}');
         }
+      } else {
+        print('响应格式错误: ${response.data}');
       }
-    } catch (e) {
-      Get.snackbar('Error', '获取初始位置失败: ${e.toString()}');
+    } catch (e, stack) {
       print('获取初始位置失败: $e');
+      print('错误堆栈: $stack');
+      Get.snackbar(
+        '错误',
+        '获取初始位置失败，将使用默认值',
+        snackPosition: SnackPosition.TOP,
+        duration: const Duration(seconds: 3),
+      );
     }
   }
 
