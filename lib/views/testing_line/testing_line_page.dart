@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../components/base_components.dart';
 import '../../components/control/vertical_slider.dart';
-import '../../components/navigation/bottom_control_bar.dart';
 import '../../controllers/testing_line/testing_line_device_controller.dart';
+import 'components/bottom_control_bar.dart';
 import 'components/judge_content.dart';
 
 class TestingLinePage extends StatelessWidget {
@@ -36,7 +36,7 @@ class TestingLinePage extends StatelessWidget {
                 // 底部导航栏 (10%)
                 const Expanded(
                   flex: 10,
-                  child: BottomControlBar(),
+                  child: TestingLineBottomBar(),
                 ),
               ],
             ),
@@ -50,8 +50,6 @@ class TestingLinePage extends StatelessWidget {
               onSetValue: controller.setSliderValue,
               onSetPosition: controller.setPosition,
               invertDirection: true,
-              minValue: 2,
-              maxValue: 100,
             ),
           ),
         ],

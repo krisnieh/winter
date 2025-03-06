@@ -54,14 +54,20 @@ class VerticalSlider extends StatelessWidget {
                   quarterTurns: 3,
                   child: Obx(() => Slider(
                     value: invertDirection 
-                      ? maxValue - sliderValue.value  // 反转值
+                      ? 100 - sliderValue.value 
                       : sliderValue.value,
-                    onChanged: (value) => onSetValue(
-                      invertDirection ? maxValue - value : value
-                    ),
-                    min: minValue,
-                    max: maxValue,
-                    divisions: (maxValue - minValue).toInt(),
+                    onChanged: (value) {
+                      // 限制最小值为2
+                      final adjustedValue = invertDirection 
+                        ? 100 - value 
+                        : value;
+                      if (adjustedValue >= 2) {
+                        onSetValue(adjustedValue);
+                      }
+                    },
+                    min: 0,           // 保持完整范围
+                    max: 100,         // 保持完整范围
+                    divisions: 100,    // 保持100个分段
                     label: sliderValue.value.toStringAsFixed(0),
                   )),
                 ),

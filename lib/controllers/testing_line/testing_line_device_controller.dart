@@ -15,6 +15,16 @@ class TestingLineDeviceController extends BaseController {
   final RxString tlCallRequestId = ''.obs;
   final RxBool isTLCallButtonEnabled = true.obs;
   final RxString tlInputValue = ''.obs;
+  // 水系统数据
+  final RxDouble pollMm = 0.0.obs;
+  final RxDouble pollNtu = 0.0.obs;
+  final RxDouble unitMm = 0.0.obs;
+  final RxDouble unitNtu = 0.0.obs;
+
+  // 添加环境数据变量
+  final RxDouble temperature = 0.0.obs;
+  final RxDouble humidity = 0.0.obs;
+  final RxInt lightLevel = 0.obs;
 
   bool _isCheckingLock = false;
   bool _isInitialized = false;  // 添加初始化标志
@@ -119,21 +129,15 @@ class TestingLineDeviceController extends BaseController {
       final url = buildUrl('/position');
       print('获取初始位置: $url');
       
-      final response = await dio.get(
-        url,
-        options: Options(
-          headers: {'Request-Id': DateTime.now().millisecondsSinceEpoch.toString()},
-        ),
-      );
-      
+      final response = await dio.get(url);
       print('初始位置响应: ${response.data}');
       
       if (response.data is Map<String, dynamic>) {
         final position = response.data['position'];
         if (position != null) {
-          // 确保值在有效范围内
           double value = double.parse(position.toString());
-          value = value.clamp(2.0, 100.0);  // 限制在2-100范围内
+          // 确保初始值不小于2
+          value = value < 2 ? 2 : value;
           tlSliderValue.value = value;
           print('设置初始位置成功: ${tlSliderValue.value}');
         }
@@ -154,8 +158,10 @@ class TestingLineDeviceController extends BaseController {
   }
 
   void setSliderValue(double value) {
-    value = value.clamp(2.0, 100.0);  // 限制在2-100范围内
-    tlSliderValue.value = value;
+    // 确保值不小于2
+    if (value >= 2) {
+      tlSliderValue.value = value;
+    }
   }
 
   Future<void> toggleLight() async {
