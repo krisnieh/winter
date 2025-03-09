@@ -35,7 +35,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
 
     if (result == true) {
-      Process.run('reboot', [], runInShell: true);
+      Process.run('sudo', ['reboot'], runInShell: true);
     }
   }
 
@@ -58,60 +58,131 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
 
     if (result == true) {
-      Process.run('shutdown', ['-h', 'now'], runInShell: true);
+      Process.run('sudo', ['shutdown', '-h', 'now'], runInShell: true);
     }
   }
 
-  void _handleUpdate() async {
-    final configController = Get.find<ConfigController>();
-    
-    final result = await Get.dialog<bool>(
+  void _showSystemInfo() {
+    Get.dialog(
       AlertDialog(
         title: const Text(
-          '系统更新',
+          '系统信息',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
         ),
-        content: const Text(
-          '确定要更新系统吗？更新完成系统将自动重启，请勿断开电源。',
-          style: TextStyle(
-            fontSize: 20,
+        content: Container(
+          width: 400,
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Image.asset(
+                    'assets/images/pttoo.png',
+                    width: 100,
+                    height: 100,
+                  ),
+                  const SizedBox(width: 16),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '匹兔® 智慧工厂系统',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          '版本: 1.0.0',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                '授权信息',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              _buildInfoRow('授权于', '江苏恒久滚塑制品有限公司'),
+              _buildInfoRow('时间', '永久'),
+              _buildInfoRow('客户服务', 'service@viirose.com'),
+              const SizedBox(height: 24),
+              const Text(
+                '版权信息',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Image.asset(
+                    'assets/images/logo.png',
+                    width: 30,
+                    height: 30,
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    '© 2017-2025 上海翠薇智能科技有限公司',
+                    style: TextStyle(fontSize: 14),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
         actions: [
           TextButton(
-            onPressed: () => Get.back(result: false),
+            onPressed: () => Get.back(),
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
             child: const Text(
-              '取消',
+              '关闭',
               style: TextStyle(fontSize: 18),
-            ),
-          ),
-          TextButton(
-            onPressed: () => Get.back(result: true),
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            ),
-            child: const Text(
-              '确定',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
             ),
           ),
         ],
         actionsPadding: const EdgeInsets.all(16),
       ),
+      barrierDismissible: true,
     );
+  }
 
-    if (result == true) {
-      Process.run('bash', ['-c', 'curl -fsSL ${ConfigController.serverUrl}/download/update.sh | sudo bash'], runInShell: true);
-    }
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Text(
+            '$label: ',
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ],
+      ),
+    );
   }
 
   void _updateTime() {
@@ -165,18 +236,28 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             icon: const Icon(Icons.arrow_drop_down),
             onSelected: (value) {
               switch (value) {
+                case 'info':
+                  _showSystemInfo();
+                  break;
                 case 'reboot':
                   _handleReboot();
                   break;
                 case 'shutdown':
                   _handleShutdown();
                   break;
-                case 'update':
-                  _handleUpdate();
-                  break;
               }
             },
             itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: 'info',
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.blue),
+                    SizedBox(width: 8),
+                    Text('系统信息'),
+                  ],
+                ),
+              ),
               const PopupMenuItem(
                 value: 'reboot',
                 child: Row(
