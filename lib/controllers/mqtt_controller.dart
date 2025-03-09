@@ -53,7 +53,7 @@ class MqttController extends GetxController {
 
   // 水系统数据
   void _handleWaterSystemData(String payload) {
-    print('水系统数据: $payload');
+    // print('水系统数据: $payload');
     try {
       final data = jsonDecode(payload);
       final controller = Get.find<TestingLineDeviceController>();
@@ -92,7 +92,7 @@ class MqttController extends GetxController {
           if (mmData.length == 2) {
             final value = (mmData[0] << 8 | mmData[1]).toDouble();  // 合并两个8位数并除以10
             controller.unitMm.value = value;
-            print('单元${unit}水深: ${controller.unitMm.value}mm');
+            // print('单元${unit}水深: ${controller.unitMm.value}mm');
           }
         }
         
@@ -101,7 +101,7 @@ class MqttController extends GetxController {
           if (ntuData.length == 2) {
             final value = (ntuData[0] << 8 | ntuData[1])/100.0;  // 合并两个8位数并除以10
             controller.unitNtu.value = value;
-            print('单元${unit}浑浊度: ${controller.unitNtu.value}NTU');
+            // print('单元${unit}浑浊度: ${controller.unitNtu.value}NTU');
           }
         }
       }
@@ -112,7 +112,7 @@ class MqttController extends GetxController {
         if (pollMmData.length == 2) {
           final value = (pollMmData[0] << 8 | pollMmData[1]).toDouble();
           controller.pollMm.value = value;
-          print('水系统水深: ${controller.pollMm.value}mm');
+          // print('水系统水深: ${controller.pollMm.value}mm');
         }
       }
       
@@ -121,7 +121,7 @@ class MqttController extends GetxController {
         if (pollNtuData.length == 2) {
           final value = (pollNtuData[0] << 8 | pollNtuData[1])/100.0;
           controller.pollNtu.value = value;
-          print('水系统浑浊度: ${controller.pollNtu.value}NTU');
+          // print('水系统浑浊度: ${controller.pollNtu.value}NTU');
         }
       }
       
@@ -193,9 +193,9 @@ class MqttController extends GetxController {
     final rawLight = (k0[4] << 8 | k0[5]) as int;
     controller.lightLevel.value = rawLight;
     
-    print('${controller.runtimeType} 环境数据更新: '
-        '温度=${controller.temperature.value}°C, '
-        '湿度=${controller.humidity.value}%, '
-        '光照=${controller.lightLevel.value}lx');
+    // print('${controller.runtimeType} 环境数据更新: '
+    //     '温度=${controller.temperature.value}°C, '
+    //     '湿度=${controller.humidity.value}%, '
+    //     '光照=${controller.lightLevel.value}lx');
   }
 } 
