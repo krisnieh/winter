@@ -88,12 +88,12 @@ class BaseController extends GetxController {
         final unit = config.parts.value[3];
         return '${ConfigController.serverUrl}/api/working_line/$list/$unit$endpoint';
       case 'TL':
-        final type = config.parts.value[2];
+        final type = config.parts.value[2].toUpperCase();
         switch (type) {
-          case 'unit':
+          case 'UNIT':
             final unit = config.parts.value[3].toUpperCase();
             return '${ConfigController.serverUrl}/api/testing_line/unit/$unit$endpoint';
-          case 'prepare':
+          case 'PREPARE':
             return '${ConfigController.serverUrl}/api/testing_line/prepare$endpoint';
         }
     }

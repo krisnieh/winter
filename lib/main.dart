@@ -4,36 +4,36 @@ import 'views/working_line/working_line_page.dart';
 import 'services/mqtt_service.dart';
 import 'package:flutter_fullscreen/flutter_fullscreen.dart';
 import 'views/testing_line/testing_line_page.dart';
+import 'views/testing_line/testing_prepare_page.dart';
 import 'dart:io';
 import 'controllers/config_controller.dart';
 // import 'views/admin/admin_page.dart';
 import 'controllers/working_line/working_line_device_controller.dart';
 import 'controllers/testing_line/testing_line_device_controller.dart';
+import 'controllers/testing_line/testing_prepare_controller.dart';
 import 'controllers/mqtt_controller.dart';
+import 'bindings/working_line_binding.dart';
+import 'bindings/testing_line_binding.dart';
+import 'bindings/testing_prepare_binding.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await FullScreen.ensureInitialized();
   FullScreen.setFullScreen(true);
   
-  // 初始化配置控制器
+  // 只保留必要的全局控制器
   final configController = Get.put(ConfigController());
   
   try {
-    // 等待配置初始化完成
     await configController.initConfig();
     
-    // 初始化其他服务
+    // 只保留全局必需的服务
     Get.put(MqttService());
-    Get.put(WorkingLineDeviceController());
-    Get.put(TestingLineDeviceController());
     Get.put(MqttController());
 
-    // 获取主机名并决定初始路由
     final config = Get.find<ConfigController>();
     final String initialRoute = getInitialRoute(config);
     
-    // 启动应用
     runApp(MyApp(initialRoute: initialRoute));
   } catch (e) {
     // 显示错误界面
@@ -87,8 +87,21 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       getPages: [
-        GetPage(name: '/working/unit', page: () => const WorkingLinePage()),
-        GetPage(name: '/testing/unit', page: () => const TestingLinePage()),
+        GetPage(
+          name: '/working/unit', 
+          page: () => const WorkingLinePage(),
+          binding: WorkingLineBinding(),
+        ),
+        GetPage(
+          name: '/testing/unit', 
+          page: () => const TestingLinePage(),
+          binding: TestingLineBinding(),
+        ),
+        GetPage(
+          name: '/testing/prepare', 
+          page: () => const TestingPreparePage(),
+          binding: TestingPrepareBinding(),
+        ),
         // GetPage(name: '/admin', page: () => const AdminPage()),
       ],
       initialRoute: initialRoute,

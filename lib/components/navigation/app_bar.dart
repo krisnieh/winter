@@ -73,7 +73,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
         content: Container(
-          width: 400,
+          width: 700,
           padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -118,17 +118,31 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
               const SizedBox(height: 8),
               _buildInfoRow('授权于', '江苏恒久滚塑制品有限公司'),
-              _buildInfoRow('时间', '永久'),
+              _buildInfoRow('时间', '开始于2023-05-01，永久有效'),
               _buildInfoRow('客户服务', 'service@viirose.com'),
-              const SizedBox(height: 24),
-              const Text(
-                '版权信息',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '授权内容和知识产权: ',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      '本系统包括软件、网络设备、服务器、存储、机柜等，其商标为本《信息》中的兔子图标、'
+                      '花形图标、七薇、匹兔、VIIROSE中之一或者其组合，其知识产权归上海翠薇智能科技有限公司所有。软件著作权所有人为上海翠薇智能科技有限公司，共有人为江苏恒久滚塑制品有限公司。',
+                      style: TextStyle(fontSize: 16),
+                      softWrap: true,
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 24),
               Row(
                 children: [
                   Image.asset(

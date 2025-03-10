@@ -57,12 +57,29 @@ class ConfigController extends GetxController {
     }
   }
 
+  String getPrepareLineName() {
+    if (line.value == 'TL' && parts.value[2].toUpperCase() == 'PREPARE') {
+      final unit = parts.value[3].toUpperCase();
+      return unit;
+    }
+    return '';
+  }
+
   // 获取MQTT主题前缀
   String getLineName() {
     switch (line.value) {
       case 'TL':
-        final unit = parts.value[3].toUpperCase();
-        return 'TL - $unit';
+        final type = parts.value[2].toUpperCase();
+        switch (type) {
+          case 'UNIT':
+            final unit = parts.value[3].toUpperCase();
+            return 'TL - $unit';
+          case 'PREPARE':
+            final unit = parts.value[3].toUpperCase();
+            return 'TL - P-$unit';
+          default:
+            return 'TL - $type';
+        }
       case 'WL':
         final list = parts.value[2].toUpperCase();
         final unit = parts.value[3];

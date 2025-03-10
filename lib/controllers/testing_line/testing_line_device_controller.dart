@@ -90,7 +90,7 @@ class TestingLineDeviceController extends BaseController {
   void setupCallArrivedSubscription() {
     final topic = buildMqttTopic('/alert/deactived');
     
-    MqttService.instance.subscribe(topic).listen(
+    Get.find<MqttService>().subscribe(topic).listen(
       (payload) {
         if (payload == tlCallRequestId.value) {
           isTLCallButtonEnabled.value = true;
@@ -311,6 +311,35 @@ class TestingLineDeviceController extends BaseController {
       debugPrint('setPosition 发生错误: $e');
       // 确保按钮状态恢复
       isTLSettingButtonEnabled.value = true;
+    }
+  }
+
+  // 添加上行请求方法
+  Future<void> sendUpRequest() async {
+    try {
+      final currentRequestId = DateTime.now().millisecondsSinceEpoch.toString();
+      final url = buildUrl('/up/$currentRequestId');
+      final response = await dio.get(
+        url,
+        options: Options(
+          headers: {'Request-Id': DateTime.now().millisecondsSinceEpoch.toString()},
+        ),
+      );
+      
+      if (response.statusCode == 200) {
+        print('上行请求成功: $url');
+      } else {
+        throw '请求失败: ${response.statusCode}';
+      }
+    } catch (e) {
+      print('上行请求失败: $e');
+      Get.snackbar(
+        '错误',
+        '上行请求失败: $e',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     }
   }
 } 

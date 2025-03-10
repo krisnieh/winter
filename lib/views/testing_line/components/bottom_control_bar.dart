@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/testing_line/testing_line_device_controller.dart';
+import '../../../controllers/config_controller.dart';
 
 class TestingLineBottomBar extends StatelessWidget {
   const TestingLineBottomBar({super.key});
@@ -39,6 +40,13 @@ class TestingLineBottomBar extends StatelessWidget {
                 child: const Icon(Icons.lightbulb),
               )),
           const SizedBox(width: 30),
+          FloatingActionButton(
+            heroTag: 'up',
+            onPressed: () => controller.sendUpRequest(),
+            backgroundColor: Colors.blue[600],
+            foregroundColor: Colors.white,
+            child: const Icon(Icons.upload),
+          ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

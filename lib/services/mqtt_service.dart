@@ -12,11 +12,15 @@ class MqttTopicMessage {
 }
 
 class MqttService extends GetxService {
-  static MqttService get instance => Get.find();
-  MqttServerClient? _client;  // 改为可空类型
+  static final MqttService _instance = MqttService._internal();
+  factory MqttService() => _instance;
+  
+  final MqttServerClient _client;
+  final Map<String, StreamController<String>> _streamControllers = {};
+  final Map<String, Function(String)> _subscriptions = {};
   final RxBool isConnected = false.obs;
   
-  // 存储待处理的订阅
+  // 存储待处理的订阅请求
   final Map<String, List<StreamController<String>>> _pendingSubscriptions = {};
   
   // 重连相关变量
@@ -24,37 +28,34 @@ class MqttService extends GetxService {
   int _reconnectAttempts = 0;
   static const int maxReconnectAttempts = 5;
   
+  MqttService._internal() : _client = MqttServerClient.withPort(
+    'ws://172.16.0.8/mqtt',  // 添加 /mqtt 路径
+    'flutter_client_${DateTime.now().millisecondsSinceEpoch}',  // 添加时间戳确保客户端ID唯一
+    8083
+  ) {
+    _initMqtt();
+  }
+
   @override
   void onInit() {
     super.onInit();
-    _initMqtt();
   }
 
   Future<void> _initMqtt() async {
     // 如果已存在连接，先断开
-    _client?.disconnect();
+    _client.disconnect();
 
-    _client = MqttServerClient.withPort(
-      'ws://172.16.0.8/mqtt',
-      'flutter_client_${DateTime.now().millisecondsSinceEpoch}',
-      8083,
-    );
-
-    final client = _client;  // 局部变量保存引用
-    if (client == null) return;  // 安全检查
-
-    client.useWebSocket = true;
-    client.websocketProtocols = ['mqtt'];
-    client.secure = false;
-    client.port = 8083;
-    client.keepAlivePeriod = 20;
-    client.logging(on: false);
+    _client.useWebSocket = true;
+    _client.websocketProtocols = ['mqtt'];
+    _client.secure = false;
+    _client.keepAlivePeriod = 20;
+    _client.logging(on: false);
 
     // 设置自动重连
-    client.autoReconnect = true;
-    client.resubscribeOnAutoReconnect = false;
+    _client.autoReconnect = true;
+    _client.resubscribeOnAutoReconnect = false;
 
-    client.onConnected = () {
+    _client.onConnected = () {
       print('MQTT已连接');
       isConnected.value = true;
       _reconnectAttempts = 0;
@@ -63,22 +64,22 @@ class MqttService extends GetxService {
       _resubscribeAll();
     };
     
-    client.onDisconnected = () {
+    _client.onDisconnected = () {
       print('MQTT已断开');
       isConnected.value = false;
       _startReconnectProcess();
     };
 
-    client.onAutoReconnect = () {
+    _client.onAutoReconnect = () {
       print('MQTT正在重连...');
     };
 
-    client.onAutoReconnected = () {
+    _client.onAutoReconnected = () {
       print('MQTT自动重连成功');
     };
 
     try {
-      await client.connect();
+      await _client.connect();
     } catch (e) {
       print('MQTT连接失败: $e');
       _startReconnectProcess();
@@ -86,10 +87,7 @@ class MqttService extends GetxService {
   }
 
   void _setupMessageHandler() {
-    final client = _client;
-    if (client == null) return;
-
-    client.updates?.listen((List<MqttReceivedMessage<MqttMessage>> c) {
+    _client.updates?.listen((List<MqttReceivedMessage<MqttMessage>> c) {
       final recMess = c[0].payload as MqttPublishMessage;
       final topic = c[0].topic;
       final payload = MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
@@ -105,35 +103,49 @@ class MqttService extends GetxService {
   }
 
   void _resubscribeAll() {
-    final client = _client;
-    if (client == null) return;
-
     print('重新订阅所有主题...');
     for (var topic in _pendingSubscriptions.keys) {
-      print('重新订阅: $topic');
-      client.subscribe(topic, MqttQos.atLeastOnce);
+      _client.subscribe(topic, MqttQos.atLeastOnce);
     }
   }
 
   Stream<String> subscribe(String topic) {
     final controller = StreamController<String>.broadcast();
-    _pendingSubscriptions.putIfAbsent(topic, () => []).add(controller);
     
-    if (isConnected.value && _client != null) {
-      _client!.subscribe(topic, MqttQos.atLeastOnce);
+    // 如果已连接，直接订阅
+    if (isConnected.value) {
+      _client.subscribe(topic, MqttQos.atLeastOnce);
+      if (!_pendingSubscriptions.containsKey(topic)) {
+        _pendingSubscriptions[topic] = [];
+      }
+      _pendingSubscriptions[topic]!.add(controller);
+    } 
+    // 如果未连接，将订阅请求加入待处理列表
+    else {
+      if (!_pendingSubscriptions.containsKey(topic)) {
+        _pendingSubscriptions[topic] = [];
+      }
+      _pendingSubscriptions[topic]!.add(controller);
     }
     
-    controller.onCancel = () {
-      _pendingSubscriptions[topic]?.remove(controller);
-      if (_pendingSubscriptions[topic]?.isEmpty ?? false) {
-        _pendingSubscriptions.remove(topic);
-        if (isConnected.value && _client != null) {
-          _client!.unsubscribe(topic);
-        }
-      }
-    };
-    
     return controller.stream;
+  }
+
+  void unsubscribe(String topic) {
+    _client.unsubscribe(topic);
+    _streamControllers[topic]?.close();
+    _streamControllers.remove(topic);
+  }
+
+  void publish(String topic, String message) {
+    final builder = MqttClientPayloadBuilder();
+    builder.addString(message);
+    _client.publishMessage(topic, MqttQos.atLeastOnce, builder.payload!);
+  }
+
+  // 处理收到的消息
+  void _handleMessage(String topic, String message) {
+    _streamControllers[topic]?.add(message);
   }
 
   void _startReconnectProcess() {
@@ -166,10 +178,10 @@ class MqttService extends GetxService {
       }
     }
     _pendingSubscriptions.clear();
-    if (_client?.connectionStatus?.state == MqttConnectionState.connected) {
-      _client?.disconnect();
+    if (_client.connectionStatus?.state == MqttConnectionState.connected) {
+      _client.disconnect();
     }
-    _client = null;
     super.onClose();
   }
 }
+
