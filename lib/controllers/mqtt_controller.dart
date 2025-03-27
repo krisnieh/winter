@@ -6,6 +6,7 @@ import './config_controller.dart';
 import 'base_controller.dart';
 import 'dart:convert';
 import 'dart:async';
+import '../controllers/admin/admin_controller.dart';
 
 class MqttController extends GetxController {
   final MqttService _mqttService = Get.find<MqttService>();
@@ -19,11 +20,11 @@ class MqttController extends GetxController {
 
   @override
   void onClose() {
-    _unsubscribeAll();
+    unsubscribeAll();
     super.onClose();
   }
 
-  void _unsubscribeAll() {
+  void unsubscribeAll() {
     for (var subscription in _subscriptions.values) {
       subscription.cancel();
     }
@@ -62,73 +63,103 @@ class MqttController extends GetxController {
     }
   }
 
+  // 解析Modbus数据
+  _paraseModbusData(List<dynamic> data) {
+    if (data.length >= 2 && data[0] is int && data[1] is int) {
+      final raw = (data[0] << 8 | data[1]) as int;
+      return raw;
+    }
+    return 0;
+  }
+
   void _handleWaterSystemData(String data) {
+    print('收到水系统数据: $data');
     try {
-      if (!Get.isRegistered<ConfigController>() || !Get.isRegistered<TestingLineDeviceController>()) {
-        return;
+      final jsonData = jsonDecode(data);
+      print('解析后的JSON数据: $jsonData');
+      
+      final map = <String, List<double>>{
+        'A': [],
+        'B': [],
+        'C': [],
+        'D': [],
+        'poll': []
+      };
+      
+      // 处理A单元数据
+      if (jsonData['1'] != null) {
+        final waterLevel = _paraseModbusData(jsonData['1']);
+        print('A单元水位: $waterLevel');
+        map['A']?.add(waterLevel.toDouble());
       }
-
-      final config = Get.find<ConfigController>();
-      final controller = Get.find<TestingLineDeviceController>();
-
-      try {
-        final jsonData = jsonDecode(data);
-        final unit = config.parts.value[3].toUpperCase();
-        
-        // 定义从站ID映射
-        late int mm_id, ntu_id;
-        const int pool_mm_id = 10;  // 水池液位从站ID固定为10
-
-        // 根据单元选择对应的从站ID
-        switch (unit) {
-          case 'A':
-            mm_id = 1;   // A单元液位
-            ntu_id = 2;  // A单元浊度
-            break;
-          case 'B':
-            mm_id = 2;   // B单元液位
-            ntu_id = 4;  // B单元浊度
-            break;
-          case 'C':
-            mm_id = 5;   // C单元液位
-            ntu_id = 6;  // C单元浊度
-            break;
-          case 'D':
-            mm_id = 7;   // D单元液位
-            ntu_id = 8;  // D单元浊度
-            break;
-          default:
-            print('未知单元: $unit');
-            return;
-        }
-
-        // 解析数据
-        // 单元液位 (mm)：直接将两个字节组合
-        final unit_mm = (jsonData[mm_id.toString()][0] << 8 | jsonData[mm_id.toString()][1]) as int;
-        
-        // 单元浊度 (NTU)：直接将两个字节组合
-        final unit_ntu = (jsonData[ntu_id.toString()][0] << 8 | jsonData[ntu_id.toString()][1]) as int;
-        
-        // 水池液位 (mm)：直接将两个字节组合
-        final pool_mm = (jsonData[pool_mm_id.toString()][0] << 8 | jsonData[pool_mm_id.toString()][1]) as int;
-
-        controller.unitMm.value = unit_mm.toDouble();
-        controller.unitNtu.value = unit_ntu.toDouble()/100;
-        controller.pollMm.value = pool_mm.toDouble();
-
-      } catch (e) {
-        print('解析水系统数据失败: $e');
-        print('原始数据: $data');
+      if (jsonData['2'] != null) {
+        final turbidity = _paraseModbusData(jsonData['2']);
+        print('A单元浑浊度: $turbidity');
+        map['A']?.add(turbidity.toDouble());
       }
-    } catch (e, stack) {
-      print('处理水系统数据出错: $e');
-      print('错误堆栈: $stack');
+      
+      // 处理B单元数据
+      if (jsonData['3'] != null) {
+        final waterLevel = _paraseModbusData(jsonData['3']);
+        print('B单元水位: $waterLevel');
+        map['B']?.add(waterLevel.toDouble());
+      }
+      if (jsonData['4'] != null) {
+        final turbidity = _paraseModbusData(jsonData['4']);
+        print('B单元浑浊度: $turbidity');
+        map['B']?.add(turbidity.toDouble());
+      }
+      
+      // 处理C单元数据
+      if (jsonData['5'] != null) {
+        final waterLevel = _paraseModbusData(jsonData['5']);
+        print('C单元水位: $waterLevel');
+        map['C']?.add(waterLevel.toDouble());
+      }
+      if (jsonData['6'] != null) {
+        final turbidity = _paraseModbusData(jsonData['6']);
+        print('C单元浑浊度: $turbidity');
+        map['C']?.add(turbidity.toDouble());
+      }
+      
+      // 处理D单元数据
+      if (jsonData['7'] != null) {
+        final waterLevel = _paraseModbusData(jsonData['7']);
+        print('D单元水位: $waterLevel');
+        map['D']?.add(waterLevel.toDouble());
+      }
+      if (jsonData['8'] != null) {
+        final turbidity = _paraseModbusData(jsonData['8']);
+        print('D单元浑浊度: $turbidity');
+        map['D']?.add(turbidity.toDouble());
+      }
+      
+      // 处理水池数据
+      if (jsonData['10'] != null) {
+        final waterLevel = _paraseModbusData(jsonData['10']);
+        print('水池水位: $waterLevel');
+        map['poll']?.add(waterLevel.toDouble());
+      }
+      
+      print('处理后的数据映射: $map');
+      
+      // 如果AdminController已注册，更新其数据
+      if (Get.isRegistered<AdminController>()) {
+        print('AdminController已注册，更新数据');
+        Get.find<AdminController>().processWaterSystemData(map);
+      } else {
+        print('AdminController未注册');
+      }
+      
+    } catch (e) {
+      print('解析水系统数据失败: $e');
+      print('原始数据: $data');
     }
   }
 
   // 工作线订阅
   void setupWorkingLineSubscriptions() {
-    _unsubscribeAll();
+    unsubscribeAll();
     
     _subscriptions['hsf/working_line/A/1/arrived'] = 
         _mqttService.subscribe('hsf/working_line/A/1/arrived').listen(_handleWorkingLineArrived);
@@ -138,7 +169,7 @@ class MqttController extends GetxController {
 
   // 测试线订阅
   void setupTestingLineSubscriptions() {
-    _unsubscribeAll();
+    unsubscribeAll();
     
     _subscriptions['hsf/air/testing_line'] = 
         _mqttService.subscribe('hsf/air/testing_line').listen(_handleEnvironmentData);
@@ -148,8 +179,16 @@ class MqttController extends GetxController {
 
   // 准备区订阅
   void setupTestingPrepareSubscriptions() {
-    _unsubscribeAll();
+    unsubscribeAll();
     // 如果准备区需要特定的MQTT主题，在这里添加
+  }
+
+  // 管理页面订阅
+  void setupAdminSubscriptions() {
+    unsubscribeAll();
+    _subscriptions['hsf/polling/hub_1'] = 
+        _mqttService.subscribe('hsf/polling/hub_1').listen(_handleWaterSystemData);
+    print('已设置管理页面订阅');
   }
 
   void _updateEnvironmentData(dynamic controller, List<dynamic> k0) {

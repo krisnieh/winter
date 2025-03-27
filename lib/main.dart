@@ -7,7 +7,7 @@ import 'views/testing_line/testing_line_page.dart';
 import 'views/testing_line/testing_prepare_page.dart';
 import 'dart:io';
 import 'controllers/config_controller.dart';
-// import 'views/admin/admin_page.dart';
+import 'views/admin/admin_page.dart';
 import 'controllers/working_line/working_line_device_controller.dart';
 import 'controllers/testing_line/testing_line_device_controller.dart';
 import 'controllers/testing_line/testing_prepare_controller.dart';
@@ -15,6 +15,7 @@ import 'controllers/mqtt_controller.dart';
 import 'bindings/working_line_binding.dart';
 import 'bindings/testing_line_binding.dart';
 import 'bindings/testing_prepare_binding.dart';
+import 'bindings/admin_binding.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -102,7 +103,11 @@ class MyApp extends StatelessWidget {
           page: () => const TestingPreparePage(),
           binding: TestingPrepareBinding(),
         ),
-        // GetPage(name: '/admin', page: () => const AdminPage()),
+        GetPage(
+          name: '/admin',
+          page: () => const AdminPage(),
+          binding: AdminBinding(),
+        ),
       ],
       initialRoute: initialRoute,
     );

@@ -7,10 +7,12 @@ import 'dart:async';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final RxBool isCallButtonEnabled;
   final RxString currentTime = ''.obs;
+  final String? title;
   
   CustomAppBar({
     super.key,
     required this.isCallButtonEnabled,
+    this.title,
   }) {
     _updateTime();
     Timer.periodic(const Duration(seconds: 1), (timer) => _updateTime());
@@ -218,7 +220,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       foregroundColor: Colors.white,
       title: Row(
         children: [
-          const Text('HFS'),
+          Text(title ?? 'HFS'),
           const SizedBox(width: 8),
           Obx(() => Text(
             configController.lineName.value,
@@ -233,7 +235,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               children: [
                 IconButton(
                   icon: const Icon(Icons.person_pin),
-                  onPressed: () {},
+                  onPressed: () {
+                    if (Get.isRegistered<dynamic>() && 
+                        Get.find<dynamic>().handleCall != null) {
+                      Get.find<dynamic>().handleCall();
+                    }
+                  },
                 ),
               ],
             ),

@@ -13,6 +13,7 @@ class ConfigController extends GetxController {
   final RxString type = ''.obs;      // unit, prepare, lift, belt 等
   final RxList<String> parts = <String>[].obs;
   final RxString lineName = ''.obs;
+  final RxMap<String, List<double>> waterSystemData = <String, List<double>>{}.obs;
 
   // 添加初始化状态标志
   final RxBool _isInitialized = false.obs;
