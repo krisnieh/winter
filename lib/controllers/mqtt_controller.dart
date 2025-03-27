@@ -64,7 +64,7 @@ class MqttController extends GetxController {
 
   void _handleWaterSystemData(String data) {
     try {
-      if (!Get.isRegistered<ConfigController>()) {
+      if (!Get.isRegistered<ConfigController>() || !Get.isRegistered<TestingLineDeviceController>()) {
         return;
       }
 
@@ -115,15 +115,6 @@ class MqttController extends GetxController {
         controller.unitMm.value = unit_mm.toDouble();
         controller.unitNtu.value = unit_ntu.toDouble()/100;
         controller.pollMm.value = pool_mm.toDouble();
-
-        // 打印解析后的数据
-        print('${unit}单元数据:');
-        print('- 液位: $unit_mm mm');
-        print('- 浊度: $unit_ntu NTU');
-        print('水池液位: $pool_mm mm');
-
-        // TODO: 更新控制器中的相关状态
-        // controller.updateWaterSystemData(unit_mm, unit_ntu, pool_mm);
 
       } catch (e) {
         print('解析水系统数据失败: $e');
