@@ -73,10 +73,8 @@ class MqttController extends GetxController {
   }
 
   void _handleWaterSystemData(String data) {
-    print('收到水系统数据: $data');
     try {
       final jsonData = jsonDecode(data);
-      print('解析后的JSON数据: $jsonData');
       
       final map = <String, List<double>>{
         'A': [],
@@ -89,63 +87,51 @@ class MqttController extends GetxController {
       // 处理A单元数据
       if (jsonData['1'] != null) {
         final waterLevel = _paraseModbusData(jsonData['1']);
-        print('A单元水位: $waterLevel');
         map['A']?.add(waterLevel.toDouble());
       }
       if (jsonData['2'] != null) {
         final turbidity = _paraseModbusData(jsonData['2']);
-        print('A单元浑浊度: $turbidity');
         map['A']?.add(turbidity.toDouble());
       }
       
       // 处理B单元数据
       if (jsonData['3'] != null) {
         final waterLevel = _paraseModbusData(jsonData['3']);
-        print('B单元水位: $waterLevel');
         map['B']?.add(waterLevel.toDouble());
       }
       if (jsonData['4'] != null) {
         final turbidity = _paraseModbusData(jsonData['4']);
-        print('B单元浑浊度: $turbidity');
         map['B']?.add(turbidity.toDouble());
       }
       
       // 处理C单元数据
       if (jsonData['5'] != null) {
         final waterLevel = _paraseModbusData(jsonData['5']);
-        print('C单元水位: $waterLevel');
         map['C']?.add(waterLevel.toDouble());
       }
       if (jsonData['6'] != null) {
         final turbidity = _paraseModbusData(jsonData['6']);
-        print('C单元浑浊度: $turbidity');
         map['C']?.add(turbidity.toDouble());
       }
       
       // 处理D单元数据
       if (jsonData['7'] != null) {
         final waterLevel = _paraseModbusData(jsonData['7']);
-        print('D单元水位: $waterLevel');
         map['D']?.add(waterLevel.toDouble());
       }
       if (jsonData['8'] != null) {
         final turbidity = _paraseModbusData(jsonData['8']);
-        print('D单元浑浊度: $turbidity');
         map['D']?.add(turbidity.toDouble());
       }
       
       // 处理水池数据
       if (jsonData['10'] != null) {
         final waterLevel = _paraseModbusData(jsonData['10']);
-        print('水池水位: $waterLevel');
         map['poll']?.add(waterLevel.toDouble());
       }
-      
-      print('处理后的数据映射: $map');
-      
+
       // 如果AdminController已注册，更新其数据
       if (Get.isRegistered<AdminController>()) {
-        print('AdminController已注册，更新数据');
         Get.find<AdminController>().processWaterSystemData(map);
       } else {
         print('AdminController未注册');
@@ -207,9 +193,5 @@ class MqttController extends GetxController {
     final rawLight = (k0[4] << 8 | k0[5]) as int;
     controller.lightLevel.value = rawLight;
     
-    // print('${controller.runtimeType} 环境数据更新: '
-    //     '温度=${controller.temperature.value}°C, '
-    //     '湿度=${controller.humidity.value}%, '
-    //     '光照=${controller.lightLevel.value}lx');
   }
 } 
