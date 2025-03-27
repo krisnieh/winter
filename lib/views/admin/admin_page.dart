@@ -272,6 +272,7 @@ class AdminPage extends StatelessWidget {
                               _buildSwitch('排水泵', controller.isDrainPumpOn),
                               _buildSwitch('注水泵', controller.isFillPumpOn),
                               _buildSwitch('自来水开关', controller.isWaterValveOn),
+                              _buildSwitch('自动水位控制', controller.isPoolAutoLevelControlOn),
                             ],
                           ),
                         ],
@@ -318,23 +319,38 @@ class AdminPage extends StatelessWidget {
                 // 根据单元获取相应的数据
                 int waterLevel = 0;
                 double turbidity = 0;
+                bool cleaningMode = false;
+                bool autoWaterMode = false;
+                bool brakeReleased = false;
                 
                 switch(unit) {
                   case 'A':
                     waterLevel = controller.unitAWaterLevel.value;
                     turbidity = controller.unitATurbidity.value / 100;
+                    cleaningMode = controller.isUnitACleaningMode.value;
+                    autoWaterMode = controller.isUnitAAutoWaterMode.value;
+                    brakeReleased = controller.isUnitABrakeReleased.value;
                     break;
                   case 'B':
                     waterLevel = controller.unitBWaterLevel.value;
                     turbidity = controller.unitBTurbidity.value / 100;
+                    cleaningMode = controller.isUnitBCleaningMode.value;
+                    autoWaterMode = controller.isUnitBAutoWaterMode.value;
+                    brakeReleased = controller.isUnitBBrakeReleased.value;
                     break;
                   case 'C':
                     waterLevel = controller.unitCWaterLevel.value;
                     turbidity = controller.unitCTurbidity.value / 100;
+                    cleaningMode = controller.isUnitCCleaningMode.value;
+                    autoWaterMode = controller.isUnitCAutoWaterMode.value;
+                    brakeReleased = controller.isUnitCBrakeReleased.value;
                     break;
                   case 'D':
                     waterLevel = controller.unitDWaterLevel.value;
                     turbidity = controller.unitDTurbidity.value / 100;
+                    cleaningMode = controller.isUnitDCleaningMode.value;
+                    autoWaterMode = controller.isUnitDAutoWaterMode.value;
+                    brakeReleased = controller.isUnitDBrakeReleased.value;
                     break;
                 }
                 
@@ -344,11 +360,43 @@ class AdminPage extends StatelessWidget {
                     Text('水位: $waterLevel mm'),
                     Text('浑浊度: $turbidity NTU'),
                     const SizedBox(height: 12),
+                    // 水阀控制开关
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _buildUnitSwitch('进水', unit, true, controller),
                         _buildUnitSwitch('排水', unit, false, controller),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    // 清洁模式开关
+                    Row(
+                      children: [
+                        const Text('清洁模式'),
+                        Switch(
+                          value: cleaningMode,
+                          onChanged: (value) => controller.toggleUnitCleaningMode(unit, value),
+                        ),
+                      ],
+                    ),
+                    // 自动注水模式开关
+                    Row(
+                      children: [
+                        const Text('自动注水'),
+                        Switch(
+                          value: autoWaterMode,
+                          onChanged: (value) => controller.toggleUnitAutoWaterMode(unit, value),
+                        ),
+                      ],
+                    ),
+                    // 刹车释放开关
+                    Row(
+                      children: [
+                        const Text('刹车释放'),
+                        Switch(
+                          value: brakeReleased,
+                          onChanged: (value) => controller.toggleUnitBrakeRelease(unit, value),
+                        ),
                       ],
                     ),
                   ],
@@ -408,6 +456,8 @@ class AdminPage extends StatelessWidget {
               Get.find<AdminController>().toggleFillPump(value);
             } else if (label == '自来水开关') {
               Get.find<AdminController>().toggleWaterValve(value);
+            } else if (label == '自动水位控制') {
+              Get.find<AdminController>().togglePoolAutoLevelControl(value);
             } else {
               isOn.value = value; // 默认行为
             }
