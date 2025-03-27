@@ -17,7 +17,7 @@ class TestingLineDeviceController extends BaseController {
   final RxString tlInputValue = ''.obs;
   // 水系统数据
   final RxDouble pollMm = 0.0.obs;
-  final RxDouble pollNtu = 0.0.obs;
+  final RxDouble pollNtu = 3.0.obs;
   final RxDouble unitMm = 0.0.obs;
   final RxDouble unitNtu = 0.0.obs;
 
